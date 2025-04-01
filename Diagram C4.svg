@@ -1,0 +1,359 @@
+<?xml version="1.0"?>
+<svg width="1982" height="969" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-diagram-type="DESCRIPTION" preserveAspectRatio="none" version="1.1">
+ <title>Диаграмма информационных потоков между модулями системы</title>
+
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="svg_2">
+   <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" id="svg_3" lengthAdjust="spacing" textLength="530.37" x="719.06" y="-5">Диаграмма информационных потоков между модулями системы</text>
+   <!--cluster system-->
+   <g id="cluster_system" transform="matrix(1, 0, 0, 1, 0, 0)">
+    <rect fill="transparent" height="507.5" id="svg_4" rx="2.5" ry="2.5" stroke="#181818" stroke-dasharray="7.0,7.0" width="1553" x="423.5" y="210.3"/>
+    <text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_5" lengthAdjust="spacing" textLength="341.96" x="1029.02" y="247.15">Система управления мероприятиями</text>
+    <text fill="#000000" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_6" lengthAdjust="spacing" textLength="59.46" x="1170.27" y="262.06">[system]</text>
+   </g>
+   <!--entity accounting-->
+   <g id="elem_accounting">
+    <rect fill="#438DD5" height="131.75" id="svg_7" rx="2.5" ry="2.5" stroke="#3C7FC0" stroke-width="0.5" width="195.03" x="1092" y="289.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_8" lengthAdjust="spacing" textLength="71.67" x="1153.68" y="310.44">«container»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_9" lengthAdjust="spacing" textLength="72.1" x="1124.51" y="328.12">Модуль</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_10" lengthAdjust="spacing" textLength="5.57" x="1196.61" y="328.12"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_11" lengthAdjust="spacing" textLength="52.34" x="1202.19" y="328.12">учёта</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_12" lengthAdjust="spacing" textLength="50.96" x="1164.04" y="343.03">[Python]</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_13" lengthAdjust="spacing" textLength="4.45" x="1187.29" y="358.85"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_14" lengthAdjust="spacing" textLength="87.83" x="1102" y="375.15">Управление</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_15" lengthAdjust="spacing" textLength="4.45" x="1189.83" y="375.15"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_16" lengthAdjust="spacing" textLength="82.76" x="1194.28" y="375.15">ресурсами,</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_17" lengthAdjust="spacing" textLength="129.4" x="1124.81" y="391.45">бронированиями,</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_18" lengthAdjust="spacing" textLength="117.52" x="1130.76" y="407.75">мероприятиями</text>
+   </g>
+   <!--entity analysis-->
+   <g id="elem_analysis">
+    <rect fill="#438DD5" height="115.45" id="svg_19" rx="2.5" ry="2.5" stroke="#3C7FC0" stroke-width="0.5" width="173.34" x="456" y="570.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_20" lengthAdjust="spacing" textLength="71.67" x="506.84" y="591.44">«container»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_21" lengthAdjust="spacing" textLength="72.1" x="466" y="609.12">Модуль</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_22" lengthAdjust="spacing" textLength="5.57" x="538.1" y="609.12"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_23" lengthAdjust="spacing" textLength="75.67" x="543.67" y="609.12">анализа</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_24" lengthAdjust="spacing" textLength="50.96" x="517.19" y="624.03">[Python]</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_25" lengthAdjust="spacing" textLength="4.45" x="540.45" y="639.85"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_26" lengthAdjust="spacing" textLength="52.8" x="474.19" y="656.15">Анализ</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_27" lengthAdjust="spacing" textLength="4.45" x="526.99" y="656.15"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_28" lengthAdjust="spacing" textLength="79.72" x="531.44" y="656.15">занятости,</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_29" lengthAdjust="spacing" textLength="108.83" x="488.25" y="672.45">рекомендации</text>
+   </g>
+   <!--entity parsing-->
+   <g id="elem_parsing">
+    <rect fill="#438DD5" height="99.16" id="svg_30" rx="2.5" ry="2.5" stroke="#3C7FC0" stroke-width="0.5" width="205.49" x="869" y="578.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_31" lengthAdjust="spacing" textLength="71.67" x="935.91" y="599.44">«container»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_32" lengthAdjust="spacing" textLength="72.1" x="890.81" y="617.12">Модуль</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_33" lengthAdjust="spacing" textLength="5.57" x="962.91" y="617.12"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_34" lengthAdjust="spacing" textLength="84.21" x="968.48" y="617.12">парсинга</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_35" lengthAdjust="spacing" textLength="50.96" x="946.27" y="632.03">[Python]</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_36" lengthAdjust="spacing" textLength="4.45" x="969.52" y="647.85"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_37" lengthAdjust="spacing" textLength="44.34" x="879" y="664.15">Поиск</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_38" lengthAdjust="spacing" textLength="4.45" x="923.34" y="664.15"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_39" lengthAdjust="spacing" textLength="65.37" x="927.79" y="664.15">внешних</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_40" lengthAdjust="spacing" textLength="4.45" x="993.16" y="664.15"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_41" lengthAdjust="spacing" textLength="66.88" x="997.61" y="664.15">ресурсов</text>
+   </g>
+   <!--entity control-->
+   <g id="elem_control">
+    <rect fill="#438DD5" height="131.75" id="svg_42" rx="2.5" ry="2.5" stroke="#3C7FC0" stroke-width="0.5" width="187.24" x="1314" y="561.8"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_43" lengthAdjust="spacing" textLength="71.67" x="1371.78" y="582.94">«container»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_44" lengthAdjust="spacing" textLength="72.1" x="1325.48" y="600.62">Модуль</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_45" lengthAdjust="spacing" textLength="5.57" x="1397.58" y="600.62"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_46" lengthAdjust="spacing" textLength="86.62" x="1403.15" y="600.62">контроля</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_47" lengthAdjust="spacing" textLength="50.96" x="1382.14" y="615.53">[Python]</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_48" lengthAdjust="spacing" textLength="4.45" x="1405.4" y="631.35"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_49" lengthAdjust="spacing" textLength="98.44" x="1358.4" y="647.65">Уведомления</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_50" lengthAdjust="spacing" textLength="99.24" x="1324" y="663.95">сотрудников,</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_51" lengthAdjust="spacing" textLength="4.45" x="1423.24" y="663.95"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_52" lengthAdjust="spacing" textLength="51.4" x="1427.69" y="663.95">работа</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_53" lengthAdjust="spacing" textLength="4.45" x="1479.09" y="663.95"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_54" lengthAdjust="spacing" textLength="7.7" x="1483.54" y="663.95">с</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_55" lengthAdjust="spacing" textLength="49.37" x="1334.93" y="680.25">Google</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_56" lengthAdjust="spacing" textLength="4.45" x="1384.3" y="680.25"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_57" lengthAdjust="spacing" textLength="91.55" x="1388.75" y="680.25">Календарем</text>
+   </g>
+   <!--entity db-->
+   <g id="elem_db">
+    <path d="m1741,575.8c0,-10 105.54,-10 105.54,-10c0,0 105.54,0 105.54,10l0,104.45c0,10 -105.54,10 -105.54,10c0,0 -105.54,0 -105.54,-10l0,-104.45" fill="#438DD5" id="svg_58" stroke="#3C7FC0" stroke-width="0.5"/>
+    <path d="m1741,575.8c0,10 105.54,10 105.54,10c0,0 105.54,0 105.54,-10" fill="transparent" id="svg_59" stroke="#3C7FC0" stroke-width="0.5"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_60" lengthAdjust="spacing" textLength="71.67" x="1810.7" y="600.94">«container»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_61" lengthAdjust="spacing" textLength="43.09" x="1786.9" y="618.62">База</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_62" lengthAdjust="spacing" textLength="5.57" x="1829.99" y="618.62"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_63" lengthAdjust="spacing" textLength="70.62" x="1835.56" y="618.62">данных</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_64" lengthAdjust="spacing" textLength="78.58" x="1807.25" y="633.53">[PostgreSQL]</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_65" lengthAdjust="spacing" textLength="4.45" x="1844.31" y="649.35"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_66" lengthAdjust="spacing" textLength="71.69" x="1774.01" y="665.65">Хранение</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_67" lengthAdjust="spacing" textLength="4.45" x="1845.7" y="665.65"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_68" lengthAdjust="spacing" textLength="55.9" x="1850.15" y="665.65">данных</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_69" lengthAdjust="spacing" textLength="4.45" x="1906.05" y="665.65"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_70" lengthAdjust="spacing" textLength="8.57" x="1910.5" y="665.65">о</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_71" lengthAdjust="spacing" textLength="66.93" x="1751" y="681.95">ресурсах</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_72" lengthAdjust="spacing" textLength="4.45" x="1817.93" y="681.95"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_73" lengthAdjust="spacing" textLength="9.1" x="1822.38" y="681.95">и</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_74" lengthAdjust="spacing" textLength="4.45" x="1831.48" y="681.95"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_75" lengthAdjust="spacing" textLength="106.15" x="1835.93" y="681.95">мероприятиях</text>
+   </g>
+   <!--entity user-->
+   <g id="elem_user">
+    <rect fill="#08427B" height="100.59" id="svg_76" rx="2.5" ry="2.5" stroke="#073B6F" stroke-width="0.5" width="149.39" x="42" y="304.8"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_77" lengthAdjust="spacing" textLength="55.95" x="88.72" y="325.94">«person»</text>
+    <image height="48" id="svg_78" width="48" x="92.7" xlink:href="data:image/png;svgedit_url=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACMElEQVR4Xu2YvUrFQBCFb%2Bkj%2BAi%2Bgq3Y2PgA%2BgCCtZ2V2AhqaSNiqY1gYWMjaCvXykoEKy21sLCNfELgMscksz8mWfDAB3Kuye7sTmYnmcwtbU9KRozSECOVla3T6uTqvrqZPlcPT68%2FXNw%2BVtvH19XC%2BsGe%2Ff9UxIhl8%2FCy%2Bvj8qrpEYIsbR1N7fSxihDK%2FurvMKoeKHbH3ikGMEJi8Z9WbtH92lxyEGCHErLwVqWfvG4IYXkiBXGIn7f29iOGBAe0kUkTVsmN4EcMD255bdgwvYnigFOYW54cdx4MYHlIqT5Niy6oYHuzgORRbUsXwYAfPoV4DeHl7t%2BMnK%2FY8EMMDzVlu9foQ5y6jFAU7hhcxvOSsRLH5D2J4KbqVqMlxoK3tnEevPogRAiuXUpFiD69ZxIghZidSV75GjFiYkGc3KMEpOW8RIxXed0kNJsrOAO0ypTfnxGvEKA0xSkMMD3zfIedJFQ4hCPlUwrX1daQWbURseonRBhNue1D5rc53JkVQwN9c21Wt%2BD20JxLjN7hpztahSwTi3RExLDlbhhCxm55PkWLMkrvrDBW73rUTYtSQu%2FaGQ4h0snNzBdD1wPWptrZDDBjL6tfiebBzbA2AUjg2NT3QYkBbrR9KTS%2F9YoC9eAxqeu0UI%2FeH21yiu7VzLSqApnIqxn8Af6TiA3A%2FA9Bn5%2BlV0xcMMWDoJs6qrakTo4a6OwZxqLa97YkxC1HzMkMzNQRtE3cFUAJilMY3OGTNL0NDLqIAAAAASUVORK5CYII%3D;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADRElEQVRoQ2NkGOKAcYi7n4HqHvAsmfc/2F6HQVFSkEGAlxMcPvefv2c4f+spw7pDVzuvLymuoGagUc0DWb3r/7ekujMIQh2Ny5H7zt5hqJ2z++yxGVkm1PAIxR6Q8m922dyVuNtITZok99TM3snQmuZBsf0UGQBy/JXFxbsJhToun/UsP8RQGmVPkRso0nz25pP/pIY8umey+zYwTCsOJNsdZGusnrUDnOapAaQDWlyfbazdQ45ZZHkAlHSebqjZTY6F2PTM3XKaIcXXjCy3kKUJVOJMLQqglvvB5jACATkGkqVp75nb/52MVcixD6cer9L5DNt7kkh2D8kaQC549+nbf3JLHlw+ILdYJcsD/4GAqsEPNIzcInVkeuDe07f/FaWEqBoJ5NYHZMXAmgOXwQ02agK6ZmJqF6PvP39nEOLjIiswydJE7ZKI3AwMrj/ITQZDuikB8zQ1KrTophUMy+ojyQ5IsjWCPAFqEx2ZlrWb3BKJ3MoLOdVQ5AFKYoLSkIfZTRUPgAyLalz+vyXFjYFQbKw9eIUhr38D2c1n9DxLNQ/ADLbKmHbG0UjJ2BDYxRTk4QALgzr154Cd+g2HrlDN4VSPAXJLM0r1UT0GKHUQqfrJ8oBmTG+HoapUOXjshwcy9rP+0FWih0pA+QWoH5q83oGT2MXbT8lKXiR5AFR5JXub4syo95+9Y9h37i44vYMc9fHLj7MgV/LzcBgbqUkxOBkpM+DrCIHGjHpWHCapY0OUB0CjbUvrIggOWpEa/bjUgzwS27yCqBgh6AFqNhlI8SAoNr3LFxAcisTrAWq3OknxAEgtqJWqE9uLNyZwegBUnh+dnmlMqqXUVg9KTs4mqjjdiVOCGg01ankGX7MDqwcGS+jDAgCUH5SkhbG6FavgnM2n/if7mFIrAKlijlZsH9YMjdUDtOi0U+oLXJ1+rB6gxbgPpR7A1e3E8AC1B24pdThMP6gZHuKgi+HeIeMBXMXpqAeolUQImTPkY4DoPAAKCVoMnxMKYULyuEYwsBajA92IQ/cMvkYdzrZQ97KD/0si7QgFDM3lQc2ImOaVOHt7eJvToDpBX1Wa7HlgSn334Pl7gt1Ugh0aSh1Ba/1D3gMANYxzQILdLxYAAAAASUVORK5CYII=" y="328.77"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_79" lengthAdjust="spacing" textLength="129.39" x="52" y="391.62">Пользователь</text>
+   </g>
+   <!--entity organizator-->
+   <g id="elem_organizator">
+    <rect fill="#08427B" height="133.19" id="svg_80" rx="2.5" ry="2.5" stroke="#073B6F" stroke-width="0.5" width="218.71" x="7" y="16.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_81" lengthAdjust="spacing" textLength="55.95" x="88.38" y="37.44">«person»</text>
+    <image height="48" id="svg_82" width="48" x="92.36" xlink:href="data:image/png;svgedit_url=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACMElEQVR4Xu2YvUrFQBCFb%2Bkj%2BAi%2Bgq3Y2PgA%2BgCCtZ2V2AhqaSNiqY1gYWMjaCvXykoEKy21sLCNfELgMscksz8mWfDAB3Kuye7sTmYnmcwtbU9KRozSECOVla3T6uTqvrqZPlcPT68%2FXNw%2BVtvH19XC%2BsGe%2Ff9UxIhl8%2FCy%2Bvj8qrpEYIsbR1N7fSxihDK%2FurvMKoeKHbH3ikGMEJi8Z9WbtH92lxyEGCHErLwVqWfvG4IYXkiBXGIn7f29iOGBAe0kUkTVsmN4EcMD255bdgwvYnigFOYW54cdx4MYHlIqT5Niy6oYHuzgORRbUsXwYAfPoV4DeHl7t%2BMnK%2FY8EMMDzVlu9foQ5y6jFAU7hhcxvOSsRLH5D2J4KbqVqMlxoK3tnEevPogRAiuXUpFiD69ZxIghZidSV75GjFiYkGc3KMEpOW8RIxXed0kNJsrOAO0ypTfnxGvEKA0xSkMMD3zfIedJFQ4hCPlUwrX1daQWbURseonRBhNue1D5rc53JkVQwN9c21Wt%2BD20JxLjN7hpztahSwTi3RExLDlbhhCxm55PkWLMkrvrDBW73rUTYtSQu%2FaGQ4h0snNzBdD1wPWptrZDDBjL6tfiebBzbA2AUjg2NT3QYkBbrR9KTS%2F9YoC9eAxqeu0UI%2FeH21yiu7VzLSqApnIqxn8Af6TiA3A%2FA9Bn5%2BlV0xcMMWDoJs6qrakTo4a6OwZxqLa97YkxC1HzMkMzNQRtE3cFUAJilMY3OGTNL0NDLqIAAAAASUVORK5CYII%3D;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADRElEQVRoQ2NkGOKAcYi7n4HqHvAsmfc/2F6HQVFSkEGAlxMcPvefv2c4f+spw7pDVzuvLymuoGagUc0DWb3r/7ekujMIQh2Ny5H7zt5hqJ2z++yxGVkm1PAIxR6Q8m922dyVuNtITZok99TM3snQmuZBsf0UGQBy/JXFxbsJhToun/UsP8RQGmVPkRso0nz25pP/pIY8umey+zYwTCsOJNsdZGusnrUDnOapAaQDWlyfbazdQ45ZZHkAlHSebqjZTY6F2PTM3XKaIcXXjCy3kKUJVOJMLQqglvvB5jACATkGkqVp75nb/52MVcixD6cer9L5DNt7kkh2D8kaQC549+nbf3JLHlw+ILdYJcsD/4GAqsEPNIzcInVkeuDe07f/FaWEqBoJ5NYHZMXAmgOXwQ02agK6ZmJqF6PvP39nEOLjIiswydJE7ZKI3AwMrj/ITQZDuikB8zQ1KrTophUMy+ojyQ5IsjWCPAFqEx2ZlrWb3BKJ3MoLOdVQ5AFKYoLSkIfZTRUPgAyLalz+vyXFjYFQbKw9eIUhr38D2c1n9DxLNQ/ADLbKmHbG0UjJ2BDYxRTk4QALgzr154Cd+g2HrlDN4VSPAXJLM0r1UT0GKHUQqfrJ8oBmTG+HoapUOXjshwcy9rP+0FWih0pA+QWoH5q83oGT2MXbT8lKXiR5AFR5JXub4syo95+9Y9h37i44vYMc9fHLj7MgV/LzcBgbqUkxOBkpM+DrCIHGjHpWHCapY0OUB0CjbUvrIggOWpEa/bjUgzwS27yCqBgh6AFqNhlI8SAoNr3LFxAcisTrAWq3OknxAEgtqJWqE9uLNyZwegBUnh+dnmlMqqXUVg9KTs4mqjjdiVOCGg01ankGX7MDqwcGS+jDAgCUH5SkhbG6FavgnM2n/if7mFIrAKlijlZsH9YMjdUDtOi0U+oLXJ1+rB6gxbgPpR7A1e3E8AC1B24pdThMP6gZHuKgi+HeIeMBXMXpqAeolUQImTPkY4DoPAAKCVoMnxMKYULyuEYwsBajA92IQ/cMvkYdzrZQ97KD/0si7QgFDM3lQc2ImOaVOHt7eJvToDpBX1Wa7HlgSn334Pl7gt1Ugh0aSh1Ba/1D3gMANYxzQILdLxYAAAAASUVORK5CYII=" y="40.27"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_83" lengthAdjust="spacing" textLength="118.29" x="57.21" y="103.12">Организатор</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_84" lengthAdjust="spacing" textLength="4.45" x="114.13" y="119.89"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_85" lengthAdjust="spacing" textLength="95.72" x="17" y="136.18">Организатор</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_86" lengthAdjust="spacing" textLength="4.45" x="112.72" y="136.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_87" lengthAdjust="spacing" textLength="98.54" x="117.17" y="136.18">мероприятий</text>
+   </g>
+   <!--entity employee-->
+   <g id="elem_employee">
+    <rect fill="#08427B" height="133.19" id="svg_88" rx="2.5" ry="2.5" stroke="#073B6F" stroke-width="0.5" width="190.93" x="21" y="561.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_89" lengthAdjust="spacing" textLength="55.95" x="88.49" y="582.44">«person»</text>
+    <image height="48" id="svg_90" width="48" x="92.47" xlink:href="data:image/png;svgedit_url=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACMElEQVR4Xu2YvUrFQBCFb%2Bkj%2BAi%2Bgq3Y2PgA%2BgCCtZ2V2AhqaSNiqY1gYWMjaCvXykoEKy21sLCNfELgMscksz8mWfDAB3Kuye7sTmYnmcwtbU9KRozSECOVla3T6uTqvrqZPlcPT68%2FXNw%2BVtvH19XC%2BsGe%2Ff9UxIhl8%2FCy%2Bvj8qrpEYIsbR1N7fSxihDK%2FurvMKoeKHbH3ikGMEJi8Z9WbtH92lxyEGCHErLwVqWfvG4IYXkiBXGIn7f29iOGBAe0kUkTVsmN4EcMD255bdgwvYnigFOYW54cdx4MYHlIqT5Niy6oYHuzgORRbUsXwYAfPoV4DeHl7t%2BMnK%2FY8EMMDzVlu9foQ5y6jFAU7hhcxvOSsRLH5D2J4KbqVqMlxoK3tnEevPogRAiuXUpFiD69ZxIghZidSV75GjFiYkGc3KMEpOW8RIxXed0kNJsrOAO0ypTfnxGvEKA0xSkMMD3zfIedJFQ4hCPlUwrX1daQWbURseonRBhNue1D5rc53JkVQwN9c21Wt%2BD20JxLjN7hpztahSwTi3RExLDlbhhCxm55PkWLMkrvrDBW73rUTYtSQu%2FaGQ4h0snNzBdD1wPWptrZDDBjL6tfiebBzbA2AUjg2NT3QYkBbrR9KTS%2F9YoC9eAxqeu0UI%2FeH21yiu7VzLSqApnIqxn8Af6TiA3A%2FA9Bn5%2BlV0xcMMWDoJs6qrakTo4a6OwZxqLa97YkxC1HzMkMzNQRtE3cFUAJilMY3OGTNL0NDLqIAAAAASUVORK5CYII%3D;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADRElEQVRoQ2NkGOKAcYi7n4HqHvAsmfc/2F6HQVFSkEGAlxMcPvefv2c4f+spw7pDVzuvLymuoGagUc0DWb3r/7ekujMIQh2Ny5H7zt5hqJ2z++yxGVkm1PAIxR6Q8m922dyVuNtITZok99TM3snQmuZBsf0UGQBy/JXFxbsJhToun/UsP8RQGmVPkRso0nz25pP/pIY8umey+zYwTCsOJNsdZGusnrUDnOapAaQDWlyfbazdQ45ZZHkAlHSebqjZTY6F2PTM3XKaIcXXjCy3kKUJVOJMLQqglvvB5jACATkGkqVp75nb/52MVcixD6cer9L5DNt7kkh2D8kaQC549+nbf3JLHlw+ILdYJcsD/4GAqsEPNIzcInVkeuDe07f/FaWEqBoJ5NYHZMXAmgOXwQ02agK6ZmJqF6PvP39nEOLjIiswydJE7ZKI3AwMrj/ITQZDuikB8zQ1KrTophUMy+ojyQ5IsjWCPAFqEx2ZlrWb3BKJ3MoLOdVQ5AFKYoLSkIfZTRUPgAyLalz+vyXFjYFQbKw9eIUhr38D2c1n9DxLNQ/ADLbKmHbG0UjJ2BDYxRTk4QALgzr154Cd+g2HrlDN4VSPAXJLM0r1UT0GKHUQqfrJ8oBmTG+HoapUOXjshwcy9rP+0FWih0pA+QWoH5q83oGT2MXbT8lKXiR5AFR5JXub4syo95+9Y9h37i44vYMc9fHLj7MgV/LzcBgbqUkxOBkpM+DrCIHGjHpWHCapY0OUB0CjbUvrIggOWpEa/bjUgzwS27yCqBgh6AFqNhlI8SAoNr3LFxAcisTrAWq3OknxAEgtqJWqE9uLNyZwegBUnh+dnmlMqqXUVg9KTs4mqjjdiVOCGg01ankGX7MDqwcGS+jDAgCUH5SkhbG6FavgnM2n/if7mFIrAKlijlZsH9YMjdUDtOi0U+oLXJ1+rB6gxbgPpR7A1e3E8AC1B24pdThMP6gZHuKgi+HeIeMBXMXpqAeolUQImTPkY4DoPAAKCVoMnxMKYULyuEYwsBajA92IQ/cMvkYdzrZQ97KD/0si7QgFDM3lQc2ImOaVOHt7eJvToDpBX1Wa7HlgSn334Pl7gt1Ugh0aSh1Ba/1D3gMANYxzQILdLxYAAAAASUVORK5CYII=" y="585.27"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_91" lengthAdjust="spacing" textLength="99.94" x="66.5" y="648.12">Сотрудник</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_92" lengthAdjust="spacing" textLength="4.45" x="114.24" y="664.89"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_93" lengthAdjust="spacing" textLength="67.94" x="31" y="681.18">Участник</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_94" lengthAdjust="spacing" textLength="4.45" x="98.94" y="681.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_95" lengthAdjust="spacing" textLength="98.54" x="103.39" y="681.18">мероприятий</text>
+   </g>
+   <!--entity flamp-->
+   <g id="elem_flamp">
+    <rect fill="#999999" height="85.19" id="svg_96" rx="2.5" ry="2.5" stroke="#8A8A8A" stroke-width="0.5" width="188.64" x="450" y="842.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_97" lengthAdjust="spacing" textLength="113.99" x="487.32" y="863.44">«external_system»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_98" lengthAdjust="spacing" textLength="76.73" x="505.96" y="881.12">flamp.ru</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_99" lengthAdjust="spacing" textLength="4.45" x="542.1" y="897.89"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_100" lengthAdjust="spacing" textLength="22.15" x="460" y="914.18">API</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_101" lengthAdjust="spacing" textLength="4.45" x="482.15" y="914.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_102" lengthAdjust="spacing" textLength="51.55" x="486.6" y="914.18">поиска</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_103" lengthAdjust="spacing" textLength="4.45" x="538.15" y="914.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_104" lengthAdjust="spacing" textLength="86.04" x="542.6" y="914.18">помещений</text>
+   </g>
+   <!--entity hh-->
+   <g id="elem_hh">
+    <rect fill="#999999" height="85.19" id="svg_105" rx="2.5" ry="2.5" stroke="#8A8A8A" stroke-width="0.5" width="197.39" x="879" y="842.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_106" lengthAdjust="spacing" textLength="113.99" x="920.7" y="863.44">«external_system»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_107" lengthAdjust="spacing" textLength="48.14" x="953.63" y="881.12">hh.ru</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_108" lengthAdjust="spacing" textLength="4.45" x="975.47" y="897.89"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_109" lengthAdjust="spacing" textLength="22.15" x="889" y="914.18">API</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_110" lengthAdjust="spacing" textLength="4.45" x="911.15" y="914.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_111" lengthAdjust="spacing" textLength="51.55" x="915.6" y="914.18">поиска</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_112" lengthAdjust="spacing" textLength="4.45" x="967.15" y="914.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_113" lengthAdjust="spacing" textLength="94.79" x="971.6" y="914.18">сотрудников</text>
+   </g>
+   <!--entity google_calendar-->
+   <g id="elem_google_calendar">
+    <rect fill="#999999" height="101.48" id="svg_114" rx="2.5" ry="2.5" stroke="#8A8A8A" stroke-width="0.5" width="168.88" x="1323" y="834.3"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="12" font-style="italic" id="svg_115" lengthAdjust="spacing" textLength="113.99" x="1350.44" y="855.44">«external_system»</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_116" lengthAdjust="spacing" textLength="62.91" x="1333" y="873.12">Google</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_117" lengthAdjust="spacing" textLength="5.57" x="1395.91" y="873.12"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" id="svg_118" lengthAdjust="spacing" textLength="80.41" x="1401.48" y="873.12">Calendar</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_119" lengthAdjust="spacing" textLength="4.45" x="1405.22" y="889.89"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_120" lengthAdjust="spacing" textLength="22.15" x="1345.38" y="906.18">API</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_121" lengthAdjust="spacing" textLength="4.45" x="1367.53" y="906.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_122" lengthAdjust="spacing" textLength="27.05" x="1371.98" y="906.18">для</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_123" lengthAdjust="spacing" textLength="4.45" x="1399.03" y="906.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_124" lengthAdjust="spacing" textLength="53.87" x="1403.48" y="906.18">работы</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_125" lengthAdjust="spacing" textLength="4.45" x="1457.35" y="906.18"/>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_126" lengthAdjust="spacing" textLength="7.7" x="1461.8" y="906.18">с</text>
+    <text fill="#FFFFFF" font-family="sans-serif" font-size="14" id="svg_127" lengthAdjust="spacing" textLength="98.98" x="1357.95" y="922.48">календарями</text>
+   </g>
+   <!--link organizator to user-->
+   <g id="link_organizator_user">
+    <path d="m116.5,149.46c0,47.9 0,103.49 0,147.24" fill="transparent" id="organizator-to-user" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_128" points="116.5,304.6968994140625 119.5,296.6968994140625 113.5,296.6968994140625 116.5,304.6968994140625 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_129" lengthAdjust="spacing" textLength="63.24" x="52.5" y="224.22">Является</text>
+   </g>
+   <!--reverse link user to employee-->
+   <g id="link_user_employee">
+    <path d="m116.5,413.92c0,43.79 0,99.42 0,147.32" fill="transparent" id="user-backto-employee" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_130" points="116.5,405.9169006347656 113.5,413.9169006347656 119.5,413.9169006347656 116.5,405.9169006347656 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_131" lengthAdjust="spacing" textLength="63.24" x="52.5" y="480.72">Является</text>
+   </g>
+   <!--link user to system-->
+   <g id="link_user_system">
+    <path d="m191.15,355.3c45.12,0 102.92,0 150.53,0c23.81,0 45.06,0 60.91,0c7.93,0 14.5,0 19.37,0c0.3,0 0.6,0 0.89,0c0.15,0 -7.71,0 -7.57,0" fill="transparent" id="user-to-system" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_132" points="423.2815856933594,355.2969055175781 415.2815856933594,352.2969055175781 415.2815856933594,358.2969055175781 423.2815856933594,355.2969055175781 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_133" lengthAdjust="spacing" textLength="62.52" x="220.11" y="353.44">Загрузка</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_134" lengthAdjust="spacing" textLength="4.18" x="282.63" y="353.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_135" lengthAdjust="spacing" textLength="69.67" x="286.81" y="353.44">CSV/форм</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_136" lengthAdjust="spacing" textLength="76.85" x="233.52" y="367.4">[HTTP/HTML,</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_137" lengthAdjust="spacing" textLength="3.81" x="310.37" y="367.4"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_138" lengthAdjust="spacing" textLength="28.89" x="314.18" y="367.4">CSV]</text>
+   </g>
+   <!--reverse link user to system-->
+   <g id="svg_1">
+    <path d="m199.15,381.3c46.57,0 98.66,0 147.11,0c24.22,0 45.53,0 60.78,0c3.82,0 7.25,0 10.26,0c1.51,0 2.9,0 4.19,0c0.64,0 1.25,0 1.84,0" fill="transparent" id="user-backto-system" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_139" points="191.14999389648438,381.2969055175781 199.14999389648438,384.2969055175781 199.14999389648438,378.2969055175781 191.14999389648438,381.2969055175781 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_140" lengthAdjust="spacing" textLength="95.38" x="228" y="393.44">Отображение</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_141" lengthAdjust="spacing" textLength="84.05" x="233.67" y="407.4">интерфейса</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_142" lengthAdjust="spacing" textLength="77.72" x="236.83" y="421.37">[HTTP/HTML]</text>
+   </g>
+   <!--link system to user-->
+   <g id="link_system_user">
+    <path d="m423.33,330.3c-0.59,0 -1.2,0 -1.84,0c-1.29,0 -2.68,0 -4.19,0c-3.01,0 -6.44,0 -10.26,0c-15.25,0 -36.56,0 -60.78,0c-48.45,0 -100.54,0 -147.11,0" fill="transparent" id="system-to-user" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_143" points="191.14999389648438,330.2969055175781 199.14999389648438,333.2969055175781 199.14999389648438,327.2969055175781 191.14999389648438,330.2969055175781 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_144" lengthAdjust="spacing" textLength="94.06" x="216.52" y="285.44">Уведомления</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_145" lengthAdjust="spacing" textLength="4.18" x="310.58" y="285.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_146" lengthAdjust="spacing" textLength="8.24" x="314.76" y="285.44">о</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_147" lengthAdjust="spacing" textLength="98.58" x="220.47" y="299.4">мероприятиях</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_148" lengthAdjust="spacing" textLength="80.72" x="229.4" y="313.37">[Внутренние</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_149" lengthAdjust="spacing" textLength="88.85" x="225.34" y="327.34">уведомления]</text>
+   </g>
+   <!--link accounting to db-->
+   <g id="link_accounting_db">
+    <path d="m1287.2,333.3c190.8,0 594.47,0 594.47,0c0,0 0,138 0,224.4" fill="transparent" id="accounting-to-db" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_150" points="1881.6700439453125,565.6968994140625 1884.6700439453125,557.6968994140625 1878.6700439453125,557.6968994140625 1881.6700439453125,565.6968994140625 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_151" lengthAdjust="spacing" textLength="135.76" x="1564.64" y="302.44">Запрос/обновление</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_152" lengthAdjust="spacing" textLength="52.96" x="1606.04" y="316.4">данных</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_153" lengthAdjust="spacing" textLength="66.54" x="1599.25" y="330.37">[JDBC/SQL]</text>
+   </g>
+   <!--link db to accounting-->
+   <g id="link_db_accounting">
+    <path d="m1811.33,565.56c0,-74.19 0,-188.26 0,-188.26c0,0 -341.32,0 -516.33,0" fill="transparent" id="db-to-accounting" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_154" points="1287,377.2969055175781 1295,380.2969055175781 1295,374.2969055175781 1287,377.2969055175781 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_155" lengthAdjust="spacing" textLength="39.84" x="1524.3" y="360.44">Ответ</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_156" lengthAdjust="spacing" textLength="4.18" x="1564.14" y="360.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_157" lengthAdjust="spacing" textLength="7.11" x="1568.32" y="360.44">с</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_158" lengthAdjust="spacing" textLength="4.18" x="1575.43" y="360.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_159" lengthAdjust="spacing" textLength="63.44" x="1579.61" y="360.44">данными</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_160" lengthAdjust="spacing" textLength="33.11" x="1567.12" y="374.4">[SQL]</text>
+   </g>
+   <!--link analysis to accounting-->
+   <g id="link_analysis_accounting">
+    <path d="m571.33,570.05c0,-63.83 0,-187.75 0,-187.75c0,0 338.37,0 512.56,0" fill="transparent" id="analysis-to-accounting" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_161" points="1091.8900146484375,382.2969055175781 1083.8900146484375,379.2969055175781 1083.8900146484375,385.2969055175781 1091.8900146484375,382.2969055175781 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_162" lengthAdjust="spacing" textLength="48.86" x="615.74" y="424.44">Запрос</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_163" lengthAdjust="spacing" textLength="4.18" x="664.6" y="424.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_164" lengthAdjust="spacing" textLength="52.96" x="668.78" y="424.44">данных</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_165" lengthAdjust="spacing" textLength="4.18" x="721.74" y="424.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_166" lengthAdjust="spacing" textLength="26.19" x="725.92" y="424.44">для</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_167" lengthAdjust="spacing" textLength="56.75" x="655.55" y="438.4">анализа</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_168" lengthAdjust="spacing" textLength="31.62" x="668.11" y="452.37">[dict]</text>
+   </g>
+   <!--link accounting to analysis-->
+   <g id="link_accounting_analysis">
+    <path d="m1090.95,334.3c-187.16,0 -580.28,0 -580.28,0c0,0 1,166.07 1,230.81" fill="transparent" id="accounting-to-analysis" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_169" points="511.66998291015625,570.1068725585938 514.6699829101562,562.1068725585938 508.6700134277344,562.1068725585938 511.66998291015625,570.1068725585938 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_170" lengthAdjust="spacing" textLength="69.04" x="519.44" y="298.44">Передача</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_171" lengthAdjust="spacing" textLength="143.09" x="482.41" y="312.4">данных/результатов</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_172" lengthAdjust="spacing" textLength="31.62" x="538.15" y="326.37">[dict]</text>
+   </g>
+   <!--link control to accounting-->
+   <g id="link_control_accounting">
+    <path d="m1313.87,568.3c-71.15,0 -156.87,0 -156.87,0c0,0 0,-76.25 0,-138.77" fill="transparent" id="control-to-accounting" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_173" points="1157,421.5268859863281 1154,429.5268859863281 1160,429.5268859863281 1157,421.5268859863281 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_174" lengthAdjust="spacing" textLength="48.86" x="1163.05" y="580.44">Запрос</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_175" lengthAdjust="spacing" textLength="4.18" x="1211.91" y="580.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_176" lengthAdjust="spacing" textLength="52.96" x="1216.09" y="580.44">данных</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_177" lengthAdjust="spacing" textLength="4.18" x="1269.05" y="580.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_178" lengthAdjust="spacing" textLength="26.19" x="1273.23" y="580.44">для</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_179" lengthAdjust="spacing" textLength="93.33" x="1184.57" y="594.4">уведомлений</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_180" lengthAdjust="spacing" textLength="31.62" x="1215.42" y="608.37">[dict]</text>
+   </g>
+   <!--link accounting to control-->
+   <g id="link_accounting_control">
+    <path d="m1222,421.46c0,61.55 0,143.84 0,143.84c0,0 37.83,0 83.93,0" fill="transparent" id="accounting-to-control" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_181" points="1313.9300537109375,565.296875 1305.9300537109375,562.296875 1305.9300537109375,568.296875 1313.9300537109375,565.296875 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_182" lengthAdjust="spacing" textLength="69.04" x="1213" y="508.49">Передача</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_183" lengthAdjust="spacing" textLength="4.18" x="1282.04" y="508.49"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_184" lengthAdjust="spacing" textLength="52.96" x="1286.21" y="508.49">данных</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_186" lengthAdjust="spacing" textLength="8.24" x="1343.35" y="508.49">о</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_187" lengthAdjust="spacing" textLength="98.58" x="1233.01" y="522.45">мероприятиях</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_188" lengthAdjust="spacing" textLength="31.62" x="1266.49" y="536.42">[dict]</text>
+   </g>
+   <!--link accounting to parsing-->
+   <g id="link_accounting_parsing">
+    <path d="m1091.64,415.3c-70.88,0 -154.31,0 -154.31,0c0,0 0,92.15 0,154.95" fill="transparent" id="accounting-to-parsing" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_189" points="937.3300170898438,578.2468872070312 940.3300170898438,570.2468872070312 934.3300170898438,570.2468872070312 937.3300170898438,578.2468872070312 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_190" lengthAdjust="spacing" textLength="48.86" x="822.33" y="418.76">Запрос</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_192" lengthAdjust="spacing" textLength="61.21" x="875.37" y="418.76">внешних</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_193" lengthAdjust="spacing" textLength="63.21" x="847.85" y="432.72">ресурсов</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_194" lengthAdjust="spacing" textLength="31.62" x="863.64" y="446.69">[dict]</text>
+   </g>
+   <!--link parsing to accounting-->
+   <g id="link_parsing_accounting">
+    <path d="m1005.67,578.15c0,-61.95 0,-159.85 0,-159.85c0,0 34.26,0 78.26,0" fill="transparent" id="parsing-to-accounting" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_195" points="1091.9300537109375,418.2969055175781 1083.9300537109375,415.2969055175781 1083.9300537109375,421.2969055175781 1091.9300537109375,418.2969055175781 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_196" lengthAdjust="spacing" textLength="49.01" x="980.67" y="467.23">Список</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_198" lengthAdjust="spacing" textLength="61.21" x="1033.86" y="467.23">внешних</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_199" lengthAdjust="spacing" textLength="63.21" x="1006.26" y="481.19">ресурсов</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_200" lengthAdjust="spacing" textLength="31.62" x="1022.06" y="495.16">[dict]</text>
+   </g>
+   <!--link parsing to flamp-->
+   <g id="link_parsing_flamp">
+    <path d="m875.67,677.6c0,78.38 0,221.7 0,221.7c0,0 -130.41,0 -228.27,0" fill="transparent" id="parsing-to-flamp" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_201" points="639.4000244140625,899.296875 647.4000244140625,902.296875 647.4000244140625,896.296875 639.4000244140625,899.296875 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_202" lengthAdjust="spacing" textLength="41.95" x="740.38" y="911.44">Поиск</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_203" lengthAdjust="spacing" textLength="4.18" x="782.33" y="911.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_204" lengthAdjust="spacing" textLength="80.99" x="786.51" y="911.44">помещений</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_205" lengthAdjust="spacing" textLength="35.55" x="753.71" y="925.4">[REST</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_206" lengthAdjust="spacing" textLength="3.81" x="789.26" y="925.4"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_207" lengthAdjust="spacing" textLength="61.1" x="793.07" y="925.4">API/HTML]</text>
+   </g>
+   <!--link flamp to parsing-->
+   <g id="link_flamp_parsing">
+    <path d="m639.32,871.3c96.82,0 233.01,0 233.01,0c0,0 0,-114.73 0,-185.93" fill="transparent" id="flamp-to-parsing" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_208" points="872.3300170898438,677.3668823242188 869.3300170898438,685.3668823242188 875.3300170898438,685.3668823242188 872.3300170898438,677.3668823242188 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_209" lengthAdjust="spacing" textLength="39.84" x="777.48" y="840.44">Ответ</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_210" lengthAdjust="spacing" textLength="4.18" x="817.32" y="840.44"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_211" lengthAdjust="spacing" textLength="7.11" x="821.5" y="840.44">с</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_212" lengthAdjust="spacing" textLength="98.51" x="753.79" y="854.4">помещениями</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_213" lengthAdjust="spacing" textLength="42.76" x="781.67" y="868.37">[HTML]</text>
+   </g>
+   <!--link parsing to hh-->
+   <g id="link_parsing_hh">
+    <path d="m1009,677.35c0,47.84 0,111.53 0,156.87" fill="transparent" id="parsing-to-hh" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_214" points="1009,842.2169189453125 1012,834.2169189453125 1006,834.2169189453125 1009,842.2169189453125 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_215" lengthAdjust="spacing" textLength="41.95" x="1010" y="772.92">Поиск</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_216" lengthAdjust="spacing" textLength="4.18" x="1051.95" y="772.92"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_217" lengthAdjust="spacing" textLength="89.1" x="1056.13" y="772.92">сотрудников</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_218" lengthAdjust="spacing" textLength="35.55" x="1027.38" y="786.88">[REST</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_219" lengthAdjust="spacing" textLength="3.81" x="1062.93" y="786.88"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_220" lengthAdjust="spacing" textLength="61.1" x="1066.75" y="786.88">API/HTML]</text>
+   </g>
+   <!--link hh to parsing-->
+   <g id="link_hh_parsing">
+    <path d="m944,842.07c0,-45.24 0,-108.6 0,-156.39" fill="transparent" id="hh-to-parsing" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_221" points="944,677.6768798828125 941,685.6768798828125 947,685.6768798828125 944,677.6768798828125 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_222" lengthAdjust="spacing" textLength="39.84" x="864" y="743.02">Ответ</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_223" lengthAdjust="spacing" textLength="4.18" x="903.84" y="743.02"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_224" lengthAdjust="spacing" textLength="7.11" x="908.02" y="743.02">с</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_225" lengthAdjust="spacing" textLength="4.18" x="915.13" y="743.02"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_226" lengthAdjust="spacing" textLength="93.69" x="919.31" y="743.02">кандидатами</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_227" lengthAdjust="spacing" textLength="42.76" x="917.12" y="756.98">[HTML]</text>
+   </g>
+   <!--link control to google_calendar-->
+   <g id="link_control_google_calendar">
+    <path d="m1435.67,693.98c0,43.73 0,92.16 0,132.28" fill="transparent" id="control-to-google_calendar" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_228" points="1435.6700439453125,834.2568969726562 1438.6700439453125,826.2568969726562 1432.6700439453125,826.2568969726562 1435.6700439453125,834.2568969726562 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_229" lengthAdjust="spacing" textLength="163.75" x="1421.67" y="776.26">Добавление/изменение</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_230" lengthAdjust="spacing" textLength="91.55" x="1457.77" y="790.22">мероприятий</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_231" lengthAdjust="spacing" textLength="47" x="1451.16" y="804.19">[Google</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_232" lengthAdjust="spacing" textLength="3.81" x="1548.16" y="804.19"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_233" lengthAdjust="spacing" textLength="53.96" x="1501.97" y="804.19">Calendar</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_234" lengthAdjust="spacing" textLength="57.29" x="1474.9" y="818.16">API/JSON]</text>
+   </g>
+   <!--link google_calendar to control-->
+   <g id="link_google_calendar_control">
+    <path d="m1379.33,834.03c0,-40.09 0,-88.33 0,-131.96" fill="transparent" id="google_calendar-to-control" stroke="#666666"/>
+    <polygon fill="#666666" id="svg_235" points="1379.3299560546875,694.06689453125 1376.3299560546875,702.06689453125 1382.3299560546875,702.06689453125 1379.3299560546875,694.06689453125 " stroke="#666666"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_236" lengthAdjust="spacing" textLength="39.84" x="1240.33" y="747.19">Ответ</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_237" lengthAdjust="spacing" textLength="4.18" x="1280.17" y="747.19"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_238" lengthAdjust="spacing" textLength="15.2" x="1284.35" y="747.19">от</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_239" lengthAdjust="spacing" textLength="4.18" x="1299.55" y="747.19"/>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-weight="bold" id="svg_240" lengthAdjust="spacing" textLength="75.54" x="1303.73" y="747.19">календаря</text>
+    <text fill="#666666" font-family="sans-serif" font-size="12" font-style="italic" id="svg_241" lengthAdjust="spacing" textLength="38.94" x="1290.33" y="761.15">[JSON]</text>
+   </g>
+   <!--SRC=[bLTjJzjM5FwUNt6RBmqIBDl4nwhI6gfr5TiOOVkAtCHDeZfsP1kfsJI9XBLqeXAZGffKJLJLjCyD8MbCIC9VkFSlx9Vid7Djv_hQXXK4EFVbESzvUuwvqx9hrbxTPFSgw-NA-cx5iNtpkN-_S2TZmsZPfdk_KF2UjUoEuHfjPi6At-sOp77zfgDir9nsnx5Dsmzt_9PlcOoVye0F-8NOXzyp-1umM9YBt_W2bk2ZU0cV5tmEQqVY1UFNiD67XIdy31cS6FEFV2GEy7613_nA7CDpm4IF1w87XyTy9euK9hPJDpspmxvS_rnPTGtx6Qv-0Qk5ksjhQuo_1SGPMWJpOo3G5qSQAeDpXItJzHoxjEUPxYehydTm_agyvXDa20xWKVXSN8aEEcx3i5i_6xv3vy_0qGlmVWwEJkWyk5xCtI6VOMF1h-5t88vXEU2NItYptR6ShcaYmdkCbjY7g8m8PKguVuj3G4CdQ2qViL3jUhxPtdtWxDbrm-sMFFeiaUCmGCx0m3MbSCYlC5I8aWahSrDSORyK67p5DLGoQZKmuhVi1gB_5UVoDM2BGt42bmT8VgiBnMDBDtIRVCnWOGoy3i3d7bLKiChuER50Klio9v9Wk7i3IvsZRLXTh-Nf30bm02meJHhBFvPx3BUXZeufanWzi8-CgPfdvCGeBFcqTIXJBoCyK9y3yXRQ1gj5Cu_L29d2B0-nZCKhSlv5Cb8GbPIz6ZovZfMoXron5_QfpezJIHc27oFoPraAQ29PY6YId1_mSsffAA8U-zfn6gWARobaKJmmGZETtyQJKlq9MZo1inFKZH7bWNI2I3cUtt3DwW-RHEmViZMFAqKzplX2gnnS2t9g0-1N2h_6pV7mkLzwQXdj3bYXlv-vUsZngwrlIAva-97WjSoo-3qaWIscW3IRSAlPpBkU7SCaH8FYjripB1CR5c32Y5R2bHXvXBbJua_IXibD13vkX50Htr051r9huTWbLV6GSenIk6rQknj9WOjayGFsAU2DmLOFocQ53l-eo5N-oS9TbYUhxD-NfoofHWIy7UhnKh7-b7C6mZUXU5QgFvMZEODXURIpirL-jFFjvYfkXVmsOycBs9tH-3cdo7rSLXCEhJvM2q1IN6Gdng2X5zd29ft8AcHMecv2T1dfiTpXbtYCH0Irbs5_d_1J8ftGKjaZw3lMC5me8ti0MIHqKs-UnniFAcLi7Oc8A4c5FfDiH9_A9hvDvGBxyYfwV4eXlv1MuXaDpKK-vyIZ5DQdwYD6Pfem5NeRgtAIeUAprkmXTagrwwsQNqo7K9NzToG8O-gEGorNPTgPI6_G3QgKeO9CqB6kVXfTW4qfAoX8Fcr5lszYZTgNgtCAzLkAzwQHbAAcZBA4sxTCgAIlCKWoZk_1Ua0Nffy0gBkdko2TVBE4mtUD7aLjIDfpbEGK3GHr_gRb7mviFwpkC53aI2GG9RoiH2dPRHfGADAaDZ56V9ccYa8ZPupaKC7RkJocL4MeJYCgze768nLKxTKXqcwTJq2cTU7DVhEufNenPP3mFfN_F4hSGHRK_oMiJTHaJwS7CFo7WuARU4qja-R85xvOWRDVmjCZd5BqkFhzTs6AKYQLnb_c2uESCTv9wmdhFm00]-->
+  </g>
+ </g>
+</svg>
