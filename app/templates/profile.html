@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Профиль пользователя</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="user-avatar-large mx-auto">
+                            <i class="bi bi-person-circle" style="font-size: 5rem; color: #0d6efd;"></i>
+                        </div>
+                    </div>
+                    <h4>{{ current_user.full_name }}</h4>
+                    <p class="text-muted mb-1">{{ current_user.email }}</p>
+                    <div class="mt-2">
+                        {% for role in user_roles %}
+                        <span class="badge bg-info me-1">{{ role }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Быстрые действия -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Действия</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <i class="bi bi-key"></i> Сменить пароль
+                    </button>
+                    <button class="btn btn-outline-secondary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="bi bi-pencil"></i> Редактировать профиль
+                    </button>
+                    <a href="/logout" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-box-arrow-right"></i> Выйти
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Статистика и активность -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Статистика активности</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Организовано мероприятий</h6>
+                                    <h2 class="text-primary">{{ organized_events }}</h2>
+                                    <p class="text-muted mb-0">за все время</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Участие в мероприятиях</h6>
+                                    <h2 class="text-primary">{{ participated_events }}</h2>
+                                    <p class="text-muted mb-0">за все время</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Последние мероприятия -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Последние организованные мероприятия</h5>
+                        <a href="/events" class="btn btn-sm btn-outline-primary">Все мероприятия</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if recent_events %}
+                    <div class="list-group">
+                        {% for event in recent_events %}
+                        <a href="{{ url_for('event_details', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ event.name }}</h6>
+                                <small class="text-muted">{{ event.start_time.strftime('%d.%m.%Y') }}</small>
+                            </div>
+                            <p class="mb-1 text-muted">{{ event.description|truncate(100) }}</p>
+                            <small>{{ event.room_name if event.room_name else 'Место не указано' }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">Вы еще не организовали ни одного мероприятия</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно смены пароля -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="/profile/change-password">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel"><i class="bi bi-key"></i> Смена пароля</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Текущий пароль</label>
+                        <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Новый пароль</label>
+                        <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                        <div class="form-text">Пароль должен содержать не менее 8 символов</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Подтвердите новый пароль</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования профиля -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="/profile/update">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel"><i class="bi bi-pencil"></i> Редактирование профиля</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">ФИО</label>
+                        <input type="text" class="form-control" id="fullName" name="full_name" value="{{ current_user.full_name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Маска для телефона (если добавим телефон в будущем)
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+            e.target.value = !x[2] ? x[1] : '+7 (' + x[2] + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
+        });
+    }
+});
+</script>
+{% endblock %}

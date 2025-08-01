@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Мероприятия</h1>
+
+    <!-- Кнопки действий -->
+    <div class="d-flex justify-content-end mb-4 action-buttons gap-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="bi bi-funnel"></i>
+        </button>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
+
+    <!-- Карточки мероприятий -->
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    {% if event.status_name == 'Активно' %}
+                        <i class="bi bi-lightning-charge-fill event-status status-active" title="Активно"></i>
+                    {% elif event.status_name == 'Завершено' %}
+                        <i class="bi bi-check-circle-fill event-status status-completed" title="Состоялось"></i>
+                    {% elif event.status_name == 'Отменено' %}
+                        <i class="bi bi-x-circle-fill event-status status-cancelled" title="Не состоялось"></i>
+                    {% elif event.status_name == 'Запланировано' %}
+                        <i class="bi bi-calendar-check-fill event-status status-planned" title="Запланировано"></i>
+                    {% endif %}
+                    <h5 class="card-title">{{ event.name }}</h5>
+                    <p class="card-text">{{ event.description }}</p>
+                    <p class="card-text"><small class="text-muted">
+                        {{ event.start_time.strftime('%d.%m.%Y') }} - {{ event.end_time.strftime('%d.%m.%Y') }}
+                    </small></p>
+                    <p class="card-text">Допустимый возраст: <strong>{{ event.age_category_name if event.age_category_name else 'Без ограничений' }}</strong></p>
+                    <p class="card-text">Количество человек: <strong>до {{ event.max_participants }}</strong></p>
+                    <p class="card-text"><i class="bi bi-calendar-event"></i> <strong>{{ event.event_type_name }}</strong></p>
+                    <p class="card-text"><i class="bi bi-building"></i> <strong>{{ event.room_name if event.room_name else 'Помещение не указано' }}</strong></p>
+                    <a href="{{ url_for('event_details', event_id=event.id) }}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">Нет мероприятий</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Модальное окно для фильтров -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Фильтры</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('events') }}" method="get">
+                    <div class="mb-3">
+                        <label for="dateFilter" class="form-label">Дата</label>
+                        <input type="date" class="form-control" id="dateFilter" name="date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="typeFilter" class="form-label">Тип мероприятия</label>
+                        <select class="form-select" id="typeFilter" name="event_type">
+                            <option value="">Все</option>
+                            {% for event_type in event_types %}
+                            <option value="{{ event_type.id }}">{{ event_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusFilter" class="form-label">Статус</label>
+                        <select class="form-select" id="statusFilter" name="status">
+                            <option value="">Все</option>
+                            {% for status in event_statuses %}
+                            <option value="{{ status.id }}">{{ status.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Применить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для создания мероприятия -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true" data-bs-backdrop="static"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEventModalLabel">Создание мероприятия</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body form-compact">
+                <form id="createEventForm" method="post" action="{{ url_for('create_event') }}">
+                    <!-- Название мероприятия -->
+                    <div class="mb-3">
+                        <label for="eventName" class="form-label">Название мероприятия</label>
+                        <input type="text" class="form-control" id="eventName" name="name" required>
+                    </div>
+
+                    <!-- Тип мероприятия -->
+                    <div class="mb-3">
+                        <label for="eventType" class="form-label">Тип мероприятия</label>
+                        <select class="form-select" id="eventType" name="event_type_id" required>
+                            <option value="" disabled selected>Выберите тип</option>
+                            {% for event_type in event_types %}
+                            <option value="{{ event_type.id }}">{{ event_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Помещение для проведения -->
+                    <div class="mb-3">
+                        <label for="eventLocation" class="form-label">Помещение для проведения</label>
+                        <select class="form-select" id="eventLocation" name="room_id" required>
+                            <option value="" disabled selected>Выберите помещение</option>
+                            {% for room in rooms %}
+                            <option value="{{ room.id }}">{{ room.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Описание мероприятия -->
+                    <div class="mb-3">
+                        <label for="eventDescription" class="form-label">Описание мероприятия</label>
+                        <div class="tooltip-wrapper">
+                            <textarea class="form-control" id="eventDescription" name="description" rows="3" required maxlength="240" 
+                                    onfocus="showTooltip(this)" onblur="hideTooltip()"></textarea>
+                            <div id="descriptionTooltip" class="custom-tooltip">
+                                Максимум 240 символов
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Даты -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="eventStartDate" class="form-label">Дата начала</label>
+                            <input type="datetime-local" class="form-control" id="eventStartDate" name="start_time" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="eventEndDate" class="form-label">Дата окончания</label>
+                            <input type="datetime-local" class="form-control" id="eventEndDate" name="end_time" required>
+                        </div>
+                    </div>
+
+                    <!-- Количество и возраст -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="eventAgeLimit" class="form-label">Допустимый возраст</label>
+                            <select class="form-select" id="eventAgeLimit" name="min_age_category_id">
+                                <option value="">Без ограничений</option>
+                                {% for age_category in age_categories %}
+                                <option value="{{ age_category.id }}">{{ age_category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="eventParticipants" class="form-label">Количество человек (до)</label>
+                            <input type="number" class="form-control" id="eventParticipants" name="max_participants" min="1" required>
+                        </div>
+                    </div>
+
+                    <!-- Сотрудники -->
+                    <div class="mb-3">
+                        <label class="form-label">Сотрудники, участвующие в мероприятии</label>
+                        <div id="selectedEmployeesContainer" class="d-flex flex-wrap mb-2">
+                            <!-- Будут добавляться динамически -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" 
+        onclick="openEmployeeModal()">
+    <i class="bi bi-person-plus"></i> Добавить сотрудников
+</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" form="createEventForm" class="btn btn-success">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно выбора сотрудников -->
+<!-- Модальное окно выбора сотрудников (добавляем data-bs-backdrop="static") -->
+<!-- Изменяем модальное окно выбора сотрудников -->
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeModalLabel">Выбор сотрудников</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-3" id="employeeTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="internal-tab" data-bs-toggle="tab" data-bs-target="#internal" type="button" role="tab">
+                            Внутренние сотрудники
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="external-tab" data-bs-toggle="tab" data-bs-target="#external" type="button" role="tab">
+                            Внешние специалисты
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="internal" role="tabpanel">
+                        <div class="list-group overflow-auto" style="max-height: 300px;">
+                            {% for employee in employees if not employee.is_external %}
+                            <label class="list-group-item">
+                                <input class="form-check-input me-2 employee-checkbox" type="checkbox" value="{{ employee.id }}">
+                                {{ employee.full_name }} ({{ employee.position }})
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="external" role="tabpanel">
+                        <div class="list-group overflow-auto" style="max-height: 300px;">
+                            {% for employee in employees if employee.is_external %}
+                            <label class="list-group-item">
+                                <input class="form-check-input me-2 employee-checkbox" type="checkbox" value="{{ employee.id }}">
+                                {{ employee.full_name }} ({{ employee.position }})
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" onclick="updateSelectedEmployees()">Добавить выбранных</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно успешного создания -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle-fill text-success"></i> Успех!
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Ваше мероприятие было успешно создано!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function openEmployeeModal() {
+    // Закрываем все открытые модальные окна
+    document.querySelectorAll('.modal.show').forEach(modal => {
+        bootstrap.Modal.getInstance(modal).hide();
+    });
+    
+    // Открываем окно создания мероприятия
+    const createModal = new bootstrap.Modal(document.getElementById('createEventModal'));
+    createModal.show();
+    
+    // Открываем окно выбора сотрудников
+    const employeeModal = new bootstrap.Modal(document.getElementById('employeeModal'));
+    employeeModal.show();
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем, нужно ли показать модальное окно
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('show_modal') && urlParams.get('show_modal') === 'true') {
+        const createModal = new bootstrap.Modal(document.getElementById('createEventModal'));
+        createModal.show();
+        
+        // Убираем параметр из URL без перезагрузки страницы
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+    
+});
+    function showTooltip() {
+    const tooltip = document.getElementById('descriptionTooltip');
+    if (tooltip) {
+        tooltip.style.display = 'block';
+    }
+}
+
+function hideTooltip() {
+    const tooltip = document.getElementById('descriptionTooltip');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+}
+    // Применяем сохраненные фильтры
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (urlParams.has('date')) {
+            document.getElementById('dateFilter').value = urlParams.get('date');
+        }
+        
+        if (urlParams.has('event_type')) {
+            document.getElementById('typeFilter').value = urlParams.get('event_type');
+        }
+        
+        if (urlParams.has('status')) {
+            document.getElementById('statusFilter').value = urlParams.get('status');
+        }
+    });
+document.getElementById('createEventForm')?.addEventListener('submit', function(e) {
+    const startDate = new Date(document.getElementById('eventStartDate').value);
+    const endDate = new Date(document.getElementById('eventEndDate').value);
+    
+    if (endDate <= startDate) {
+        e.preventDefault();
+        alert('Дата окончания должна быть позже даты начала');
+        return false;
+    }
+    
+    return true;
+});
+    function updateSelectedEmployees() {
+    const container = document.getElementById('selectedEmployeesContainer');
+    const checkboxes = document.querySelectorAll('#employeeModal .employee-checkbox:checked');
+    
+    checkboxes.forEach(checkbox => {
+        const label = checkbox.closest('label').textContent.trim();
+        const value = checkbox.value;
+        const isExternal = checkbox.closest('#external') !== null;
+
+        // Проверяем, не добавлен ли уже этот сотрудник
+        if (!document.querySelector(`input[name="employee_ids"][value="${value}"]`)) {
+            const chip = document.createElement('div');
+            chip.className = 'employee-chip';
+            chip.innerHTML = `
+                ${label} 
+                <span class="employee-badge ${isExternal ? 'badge-external' : 'badge-internal'}">
+                    ${isExternal ? 'Внешний' : 'Внутренний'}
+                </span>
+                <button type="button" onclick="this.parentElement.remove()">
+                    <i class="bi bi-x"></i>
+                </button>
+                <input type="hidden" name="employee_ids" value="${value}">
+            `;
+            container.appendChild(chip);
+        }
+
+        checkbox.checked = false;
+    });
+
+    // Закрываем только модальное окно выбора сотрудников
+    const employeeModalEl = document.getElementById('employeeModal');
+    const employeeModal = bootstrap.Modal.getInstance(employeeModalEl);
+    employeeModal.hide();
+    
+    // Возвращаем фокус на модальное окно создания мероприятия
+    const createEventModal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
+    createEventModal._element.focus();
+    
+    // Принудительно показываем backdrop родительского окна
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = '0px';
+    document.querySelector('.modal-backdrop').style.display = 'block';
+}
+
+
+    // Обработка успешного создания мероприятия
+    document.getElementById('createEventForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                // Закрываем модальное окно создания
+                const createModal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
+                createModal.hide();
+                
+                // Показываем модальное окно успеха
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+                
+                // Обновляем страницу через 2 секунды
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                alert('Ошибка при создании мероприятия');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при создании мероприятия');
+        }
+    });
+</script>
+{% endblock %}

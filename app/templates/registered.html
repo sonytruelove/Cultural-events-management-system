@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Герой-секция -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">Добро пожаловать, {{ current_user.full_name }}!</h1>
+        <p class="lead mb-5">Управляйте культурно-массовыми мероприятиями вашей организации</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card p-4">
+                    <i class="bi bi-calendar-check feature-icon"></i>
+                    <h3>Мероприятия</h3>
+                    <p>Удобное создание и управление мероприятиями</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-4">
+                    <i class="bi bi-people feature-icon"></i>
+                    <h3>Управление</h3>
+                    <p>Управление сотрудниками и помещениями для каждого мероприятия</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-4">
+                    <i class="bi bi-bar-chart feature-icon"></i>
+                    <h3>Аналитика</h3>
+                    <p>Отчеты по проведенным мероприятиям и использованию ресурсов</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Основной контент -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h2 class="mb-4">Ближайшие мероприятия</h2>
+            
+            <!-- В секции ближайших мероприятий -->
+            {% for event in upcoming_events %}
+            <div class="card event-card mb-3">
+                <div class="card-header bg-primary text-white">
+                    {{ event.start_time.strftime('%d.%m.%Y, %H:%M') }} - {{ event.name }}
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><i class="bi bi-geo-alt"></i> {{ event.room.name if event.room else 'Место не указано' }}</p>
+                    <p class="card-text">Участников: <strong>до {{ event.max_participants }}</strong></p>
+                    <p class="card-text"><i class="bi bi-calendar-event"></i> <strong>{{ event.event_type.name }}</strong></p>
+                    <p class="card-text"><i class="bi bi-building"></i> <strong>{{ event.room.name if event.room else 'Помещение не указано' }}</strong></p>
+                    <a href="{{ url_for('event_details', event_id=event.id) }}" class="btn btn-sm btn-outline-primary">Подробнее</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">Нет предстоящих мероприятий</div>
+            {% endfor %}
+            
+            <a href="{{ url_for('events') }}" class="btn btn-primary mt-2">Все мероприятия</a>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Быстрые действия</h5>
+                </div>
+                <div class="card-body quick-actions">
+                    <a href="/events?show_modal=true" class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-plus-circle"></i> Создать мероприятие
+                    </a>
+                    <a href="{{ url_for('rooms') }}" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="bi bi-house"></i> Управление помещениями
+                    </a>
+                    <a href="{{ url_for('employees') }}" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="bi bi-people"></i> Управление сотрудниками
+                    </a>
+                    <a href="{{ url_for('activity') }}" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="bi bi-graph-up"></i> Деятельность
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

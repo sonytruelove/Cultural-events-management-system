@@ -1,0 +1,69 @@
+<!-- Навигация -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключение Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Подключение ваших стилей -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<div class="container-fluid logo-fullwidth">
+    <img src="/static/images/logo.svg" alt="Логотип">
+    <div class="logo-text">
+        Автоматизированная система управления культурно-массовыми мероприятиями
+    </div>
+</div>
+{% if request.cookies.get("session_token") %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.url.path == '/' }}" href="/">
+                        <i class="bi bi-info-circle"></i> Главная
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.url.path == '/events' }}" href="/events">
+                        <i class="bi bi-calendar-event"></i> Мероприятия
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.url.path == '/rooms' }}" href="/rooms">
+                        <i class="bi bi-bank"></i></i> Ресурсы
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.url.path == '/activity' }}" href="/activity">
+                        <i class="bi bi-graph-up"></i> Деятельность
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">
+                        <i class="bi bi-person-circle"></i> Профиль
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/?auth=false">
+                        <i class="bi bi-box-arrow-right"></i> Выйти
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% endif %}
+
+        {% block content %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

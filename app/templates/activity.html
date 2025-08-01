@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Деятельность организации</h1>
+
+    <!-- Назначение документа -->
+    <div class="card purpose-card mb-4">
+        <div class="card-body">
+            <h4><i class="bi bi-journal-text"></i> Назначение документа</h4>
+            <p class="mb-0">На этой странице вы можете сформировать отчеты о деятельности организации за выбранный период времени. Отчеты включают информацию о проведенных мероприятиях, их посещаемости и статуса планирования. Выберите период, мероприятие, параметр фильтрации и его значение, затем нажмите "Сформировать отчет".</p>
+        </div>
+    </div>
+
+    <!-- Период отчета и фильтры -->
+    <div class="report-period">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="startDate" class="form-label">Период с</label>
+                <input type="date" class="form-control" id="startDate" required>
+            </div>
+            <div class="col-md-3">
+                <label for="endDate" class="form-label">по</label>
+                <input type="date" class="form-control" id="endDate" required>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="button" class="btn btn-primary me-2" id="generateReportBtn">
+                    <i class="bi bi-file-earmark-text"></i> Сформировать отчет
+                </button>
+                <button type="button" class="btn btn-success" id="exportBtn" data-bs-toggle="modal"
+                    data-bs-target="#exportModal" disabled>
+                    <i class="bi bi-download"></i> Экспорт
+                </button>
+            </div>
+        </div>
+        
+        <!-- Фильтры -->
+        <div class="filter-options mt-3">
+            <h5><i class="bi bi-gear"></i> Параметры формирования отчета</h5>
+            
+            <!-- Выбор мероприятия -->
+            <div class="row filter-row mb-3">
+                <div class="col-md-4">
+                    <label for="eventSelect" class="form-label">Мероприятие</label>
+                    <select class="form-select" id="eventSelect">
+                        <option value="all">Все мероприятия</option>
+                        {% for event in events %}
+                        <option value="{{ event.id }}">{{ event.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Выбор параметра фильтрации -->
+            <div class="row filter-row mb-3">
+                <div class="col-md-4">
+                    <label for="filterType" class="form-label">Фильтровать по</label>
+                    <select class="form-select" id="filterType">
+                        <option value="">Не выбрано</option>
+                        <option value="room">Помещение</option>
+                        <option value="employees">Сотрудники</option>
+                        <option value="participants">Количество участников</option>
+                        <option value="age">Допустимый возраст</option>
+                        <option value="status">Статус</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Поле для значения фильтра (появляется после выбора параметра) -->
+            <div class="row">
+                <div class="col-md-4">
+                    <!-- Помещение -->
+                    <div class="filter-field mb-3" id="roomField" style="display: none;">
+                        <label for="roomSelect" class="form-label">Помещение</label>
+                        <select class="form-select" id="roomSelect">
+                            <option value="all">Все помещения</option>
+                            {% for room in rooms %}
+                            <option value="{{ room.id }}">{{ room.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Сотрудники -->
+                    <div class="filter-field mb-3" id="employeesField" style="display: none;">
+                        <label for="employeeSelect" class="form-label">Сотрудник</label>
+                        <select class="form-select" id="employeeSelect">
+                            <option value="all">Все сотрудники</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Количество участников -->
+                    <div class="filter-field mb-3" id="participantsField" style="display: none;">
+                        <label for="participantsInput" class="form-label">Количество участников</label>
+                        <div class="input-group participants-input">
+                            <input type="number" class="form-control" id="participantsInput" min="0" placeholder="Укажите число">
+                            <span class="input-group-text">чел.</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Допустимый возраст -->
+                    <div class="filter-field mb-3" id="ageField" style="display: none;">
+                        <label for="ageSelect" class="form-label">Допустимый возраст</label>
+                        <select class="form-select" id="ageSelect">
+                            <option value="all">Любой возраст</option>
+                            {% for age in age_categories %}
+                            <option value="{{ age.id }}">{{ age.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Статус -->
+                    <div class="filter-field mb-3" id="statusField" style="display: none;">
+                        <label for="statusSelect" class="form-label">Статус</label>
+                        <select class="form-select" id="statusSelect">
+                            <option value="all">Все статусы</option>
+                            {% for status in event_statuses %}
+                            <option value="{{ status.id }}">{{ status.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Результаты отчета -->
+    <div class="report-header mt-4 p-3 bg-light rounded">
+        <h4><i class="bi bi-file-earmark-text"></i> Отчет о мероприятиях</h4>
+        <p class="mb-1">Период: <strong id="reportPeriod">Не выбран</strong></p>
+        <p class="mb-1">Найдено мероприятий: <strong id="eventsCount">0</strong></p>
+        <p class="mb-0" id="additionalFilters" style="display: none;">Дополнительные фильтры: <strong id="filtersText">Нет</strong></p>
+    </div>
+    
+    <!-- Таблица с результатами -->
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-hover report-table">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center">№</th>
+                    <th class="text-left">Название</th>
+                    <th class="text-center">Даты проведения</th>
+                    <th class="text-center">Статус</th>
+                    <th class="text-center">Возраст</th>
+                    <th class="text-center">Участников</th>
+                    <th class="text-left">Тип</th>
+                    <th class="text-center">Помещение</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Данные не загружены</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Пагинация -->
+    <nav aria-label="Page navigation" id="pagination" class="mt-3" style="display: none;">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Модальное окно экспорта -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel"><i class="bi bi-download"></i> Экспорт отчета</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="exportFormat" class="form-label">Формат экспорта</label>
+                    <select class="form-select" id="exportFormat">
+                        <option value="excel">Excel (.xlsx)</option>
+                        <option value="pdf">PDF (.pdf)</option>
+                        <option value="csv">CSV (.csv)</option>
+                    </select>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Будет экспортирован отчет за выбранный период с учетом текущих фильтров.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="confirmExport">Экспортировать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно ошибки -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Ошибка</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="errorMessage">
+                Произошла ошибка при формировании отчета
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Устанавливаем даты по умолчанию (текущий месяц)
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    document.getElementById('startDate').valueAsDate = firstDay;
+    document.getElementById('endDate').valueAsDate = lastDay;
+    
+    // Обработка выбора типа фильтра
+    document.getElementById('filterType').addEventListener('change', function() {
+        // Скрываем все поля фильтра
+        document.querySelectorAll('.filter-field').forEach(field => {
+            field.style.display = 'none';
+        });
+        
+        // Показываем соответствующее поле
+        const selectedFilter = this.value;
+        if (selectedFilter) {
+            const field = document.getElementById(selectedFilter + 'Field');
+            if (field) {
+                field.style.display = 'block';
+            }
+        }
+    });
+    
+    // Обработка формы генерации отчета
+    document.getElementById('generateReportBtn').addEventListener('click', async function() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const eventId = document.getElementById('eventSelect').value;
+        const filterType = document.getElementById('filterType').value;
+        let filterValue = '';
+        
+        // Валидация дат
+        if (!startDate || !endDate) {
+            showError('Пожалуйста, укажите период отчета');
+            return;
+        }
+        
+        if (new Date(startDate) > new Date(endDate)) {
+            showError('Дата окончания не может быть раньше даты начала');
+            return;
+        }
+        
+        // Получаем значение фильтра в зависимости от типа
+        if (filterType) {
+            const filterField = document.getElementById(filterType + 'Field');
+            if (filterField) {
+                if (filterType === 'participants') {
+                    filterValue = document.getElementById('participantsInput').value;
+                    if (!filterValue || isNaN(filterValue)) {
+                        showError('Пожалуйста, укажите корректное количество участников');
+                        return;
+                    }
+                } else {
+                    const select = filterField.querySelector('select');
+                    filterValue = select ? select.value : '';
+                }
+            }
+        }
+        
+        // Показываем индикатор загрузки
+        const originalBtnText = this.innerHTML;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Формирование отчета...';
+        this.disabled = true;
+        
+        try {
+            // Формируем данные для отправки
+            const formData = new FormData();
+            formData.append('start_date', startDate);
+            formData.append('end_date', endDate);
+            if (eventId && eventId !== 'all') {
+                formData.append('event_id', eventId);
+            }
+            if (filterType && filterValue && filterValue !== 'all') {
+                formData.append('filter_type', filterType);
+                formData.append('filter_value', filterValue);
+            }
+            
+            const response = await fetch('/api/activity/report', {
+                method: 'POST',
+                body: new URLSearchParams(formData),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка сервера');
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                updateReportTable(data.data, {
+                    startDate,
+                    endDate,
+                    eventId,
+                    filterType,
+                    filterValue
+                });
+                document.getElementById('exportBtn').disabled = false;
+            } else {
+                throw new Error(data.error || 'Не удалось сформировать отчет');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError(error.message);
+        } finally {
+            // Восстанавливаем кнопку
+            this.innerHTML = originalBtnText;
+            this.disabled = false;
+        }
+    });
+    
+    // Обработка экспорта отчета
+    document.getElementById('confirmExport').addEventListener('click', function() {
+        const format = document.getElementById('exportFormat').value;
+        alert(`Функция экспорта в формате ${format.toUpperCase()} будет реализована в следующих версиях`);
+        bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+    });
+    
+    // Функция обновления таблицы с результатами
+    function updateReportTable(data, filters) {
+        const tbody = document.querySelector('.report-table tbody');
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Нет данных для отображения</td></tr>';
+            document.getElementById('pagination').style.display = 'none';
+            return;
+        }
+        
+        data.forEach((event, index) => {
+            const row = document.createElement('tr');
+            
+            // Определяем класс для статуса
+            let statusClass = 'status-completed';
+            if (event.status === 'Запланировано') statusClass = 'status-planned';
+            else if (event.status === 'Активно') statusClass = 'status-active';
+            else if (event.status === 'Отменено') statusClass = 'status-cancelled';
+            
+            row.innerHTML = `
+                <td class="text-center">${index + 1}</td>
+                <td class="text-left">${event.name || '—'}</td>
+                <td class="text-center">${event.start_date || '—'} - ${event.end_date || '—'}</td>
+                <td class="text-center"><span class="badge ${statusClass}">${event.status || '—'}</span></td>
+                <td class="text-center">${event.age_category || '—'}</td>
+                <td class="text-center">${event.participants || '—'}</td>
+                <td class="text-left">${event.event_type || '—'}</td>
+                <td class="text-left">${event.room || '—'}</td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+        
+        // Обновляем информацию о периоде и количестве мероприятий
+        document.getElementById('reportPeriod').textContent = 
+            `${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}`;
+        
+        document.getElementById('eventsCount').textContent = data.length;
+        
+        // Обновляем информацию о фильтрах
+        const additionalFiltersEl = document.getElementById('additionalFilters');
+        const filtersTextEl = document.getElementById('filtersText');
+        let filtersText = [];
+        
+        if (filters.eventId && filters.eventId !== 'all') {
+            const eventName = document.getElementById('eventSelect').options[document.getElementById('eventSelect').selectedIndex].text;
+            filtersText.push(`Мероприятие: ${eventName}`);
+        }
+        
+        if (filters.filterType) {
+            let filterText = '';
+            switch (filters.filterType) {
+                case 'room':
+                    if (filters.filterValue !== 'all') {
+                        const roomName = document.getElementById('roomSelect').options[document.getElementById('roomSelect').selectedIndex].text;
+                        filterText = `Помещение: ${roomName}`;
+                    }
+                    break;
+                case 'employees':
+                    if (filters.filterValue !== 'all') {
+                        const employeeName = document.getElementById('employeeSelect').options[document.getElementById('employeeSelect').selectedIndex].text;
+                        filterText = `Сотрудник: ${employeeName}`;
+                    }
+                    break;
+                case 'participants':
+                    filterText = `Участников: ≥ ${filters.filterValue}`;
+                    break;
+                case 'age':
+                    if (filters.filterValue !== 'all') {
+                        const ageName = document.getElementById('ageSelect').options[document.getElementById('ageSelect').selectedIndex].text;
+                        filterText = `Возраст: ${ageName}`;
+                    }
+                    break;
+                case 'status':
+                    if (filters.filterValue !== 'all') {
+                        const statusName = document.getElementById('statusSelect').options[document.getElementById('statusSelect').selectedIndex].text;
+                        filterText = `Статус: ${statusName}`;
+                    }
+                    break;
+            }
+            
+            if (filterText) filtersText.push(filterText);
+        }
+        
+        if (filtersText.length > 0) {
+            filtersTextEl.textContent = filtersText.join('; ');
+            additionalFiltersEl.style.display = 'block';
+        } else {
+            additionalFiltersEl.style.display = 'none';
+        }
+        
+        // Показываем/скрываем пагинацию в зависимости от количества результатов
+        document.getElementById('pagination').style.display = data.length > 15 ? 'block' : 'none';
+    }
+    
+    // Функция форматирования даты (YYYY-MM-DD -> DD.MM.YYYY)
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const [year, month, day] = dateString.split('-');
+        return `${day}.${month}.${year}`;
+    }
+    
+    // Функция показа ошибки
+    function showError(message) {
+        document.getElementById('errorMessage').textContent = message;
+        const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+        modal.show();
+    }
+});
+</script>
+{% endblock %}

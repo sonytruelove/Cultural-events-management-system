@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Герой-секция -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">Система управления мероприятиями</h1>
+        <p class="lead mb-5">Профессиональный инструмент для организации и управления культурно-массовыми мероприятиями вашей организации</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card p-4">
+                    <i class="bi bi-calendar-check feature-icon"></i>
+                    <h3>Учёт</h3>
+                    <p>Удобное создание и управление мероприятиями</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-4">
+                    <i class="bi bi-people feature-icon"></i>
+                    <h3>Управление</h3>
+                    <p>Контроль сотрудников и помещений для каждого мероприятия</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-4">
+                    <i class="bi bi-bar-chart feature-icon"></i>
+                    <h3>Аналитика</h3>
+                    <p>Отчеты по проведенным мероприятиям и использованию ресурсов</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Основной контент -->
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h2 class="mb-4">О системе</h2>
+            <p class="lead">Данная система предназначена исключительно для сотрудников организации и предоставляет полный набор инструментов для управления культурно-массовыми мероприятиями.</p>
+
+            <h4 class="mt-5 mb-3">Основные возможности:</h4>
+            <ul class="list-group mb-4">
+                <li class="list-group-item">Создание и редактирование мероприятий с детальным описанием</li>
+                <li class="list-group-item">Бронирование помещений и сотрудников для мероприятий</li>
+                <li class="list-group-item">Формирование отчетов и аналитических данных</li>
+            </ul>
+
+            <div class="alert alert-info mt-5">
+                <h4><i class="bi bi-exclamation-circle"></i> Важно!</h4>
+                <p>Доступ к системе имеют только авторизованные сотрудники организации. Для получения доступа обратитесь к системному администратору по адресу <a href="mailto:admin@eventsystem.com">admin@eventsystem.com</a>.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="auth-section p-4">
+                <h3 class="mb-4">Как войти в систему?</h3>
+
+                <div class="instruction-step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h5>Получите учетные данные</h5>
+                        <p>Обратитесь к системному администратору для получения логина и пароля</p>
+                    </div>
+                </div>
+
+                <div class="instruction-step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h5>Нажмите кнопку "Войти"</h5>
+                        <p>Используйте кнопку ниже для открытия формы входа</p>
+                    </div>
+                </div>
+
+                <div class="instruction-step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h5>Введите свои данные</h5>
+                        <p>Введите предоставленные вам логин и пароль в форму авторизации</p>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="bi bi-box-arrow-in-right"></i> Войти в систему
+                    </button>
+                    <button class="btn btn-warning" onclick="fillAdminCredentials()">
+                        <i class="bi bi-person-check"></i> Быстрый вход для администратора
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно авторизации -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="
+loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Вход в систему</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                <form action="/login" method="post">
+                    <div class="mb-3">
+                        <label for="loginEmail" class="form-label">Логин (email)</label>
+                        <input type="email" class="form-control" id="loginEmail" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPassword" class="form-label">Пароль</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="loginPassword" name="password" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                        <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Войти</button>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <a href="#" class="text-muted" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Забыли пароль?</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно "Забыли пароль" -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Восстановление пароля</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if message %}
+                <div class="alert alert-success">{{ message }}</div>
+                {% endif %}
+                <form action="/forgot-password" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Email вашей учетной записи</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Отправить инструкции</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('loginPassword');
+        const icon = document.querySelector('#togglePassword i');
+        
+        if (!passwordInput || !icon) return;
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+        }
+    }
+
+    function initPasswordToggle() {
+        const toggleBtn = document.getElementById('togglePassword');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', togglePasswordVisibility);
+        }
+    }
+
+    function fillAdminCredentials() {
+        document.getElementById('loginEmail').value = '{{ admin_username }}';
+        document.getElementById('loginPassword').value = '{{ admin_password }}';
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+        
+        // Переинициализируем обработчик после показа модального окна
+        setTimeout(initPasswordToggle, 500);
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        initPasswordToggle();
+        
+        {% if show_login_modal %}
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginModal.show();
+        // Повторная инициализация после показа модалки
+        setTimeout(initPasswordToggle, 500);
+        {% endif %}
+    });
+</script>
+{% endblock %}
+{% endblock %}

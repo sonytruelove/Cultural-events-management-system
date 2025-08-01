@@ -1,0 +1,346 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ event.name }}</h1>
+        <div>
+            <a href="{{ url_for('events') }}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editEventModal">
+                <i class="bi bi-pencil"></i> Редактировать
+            </button>
+             <button class="btn btn-outline-danger" onclick="confirmDelete({{ event.id }})">
+            <i class="bi bi-trash"></i> Удалить
+             </button>
+
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Описание:</strong> {{ event.description }}</p>
+                    <p><strong>Тип мероприятия:</strong> {{ event.event_type_name }}</p>
+                    <p><strong>Статус:</strong> 
+                        <span class="badge 
+                            {% if event.status_name == 'Запланировано' %}bg-primary
+                            {% elif event.status_name == 'Активно' %}bg-warning
+                            {% elif event.status_name == 'Завершено' %}bg-success
+                            {% elif event.status_name == 'Отменено' %}bg-danger
+                            {% endif %}">
+                            {{ event.status_name }}
+                        </span>
+                    </p>
+                    <p><strong>Организатор:</strong> {{ event.organizer_name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Дата и время:</strong> 
+                        {{ event.start_time.strftime('%d.%m.%Y %H:%M') }} - 
+                        {{ event.end_time.strftime('%d.%m.%Y %H:%M') }}</p>
+                    <p><strong>Помещение:</strong> {{ event.room_name }}</p>
+                    <p><strong>Допустимый возраст:</strong> {{ event.age_category_name or 'Без ограничений' }}</p>
+                    <p><strong>Максимальное количество участников:</strong> {{ event.max_participants }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Сотрудники</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addParticipantsModal">
+                <i class="bi bi-plus"></i> Добавить сотрудников
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if employees %}
+        <div class="row">
+            {% for employee in employees %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6>{{ employee.full_name }}</h6>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeParticipant({{ event.id }}, {{ employee.id }})">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <p class="mb-1">{{ employee.position }}</p>
+                        <span class="badge {{ 'bg-warning' if employee.is_external else 'bg-success' }}">
+                            {{ 'Внешний' if employee.is_external else 'Внутренний' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">Нет назначенных сотрудников</div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<!-- Модальное окно редактирования мероприятия -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Редактирование мероприятия</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventForm" method="post" action="{{ url_for('update_event', event_id=event.id) }}">
+                    <!-- Название мероприятия -->
+                    <!-- В секции редактирования мероприятия (в модальном окне) -->
+
+<!-- Название мероприятия -->
+<div class="mb-3">
+    <label for="editEventName" class="form-label">Название мероприятия</label>
+    <input type="text" class="form-control" id="editEventName" name="name" 
+           value="{{ event.name }}" required>
+</div>
+
+<!-- Описание мероприятия -->
+<div class="mb-3">
+    <label for="editEventDescription" class="form-label">Описание</label>
+    <textarea class="form-control" id="editEventDescription" name="description" 
+              rows="3" required>{{ event.description }}</textarea>
+</div>
+
+<div class="row g-3 mb-3">
+    <!-- Тип мероприятия -->
+    <div class="col-md-6">
+        <label for="editEventType" class="form-label">Тип мероприятия</label>
+        <select class="form-select" id="editEventType" name="event_type_id" required>
+            {% for type in event_types %}
+            <option value="{{ type.id }}" 
+                    {% if type.id == event.event_type_id %}selected{% endif %}>
+                {{ type.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Статус мероприятия -->
+    <div class="col-md-6">
+        <label for="editEventStatus" class="form-label">Статус</label>
+        <select class="form-select" id="editEventStatus" name="status_id" required>
+            {% for status in event_statuses %}
+            <option value="{{ status.id }}"
+                    {% if status.id == event.status_id %}selected{% endif %}>
+                {{ status.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<!-- Помещение -->
+<div class="mb-3">
+    <label for="editEventRoom" class="form-label">Помещение</label>
+    <select class="form-select" id="editEventRoom" name="room_id" required>
+        {% for room in rooms %}
+        <option value="{{ room.id }}"
+                {% if room.id == event.room_id %}selected{% endif %}>
+            {{ room.name }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<!-- Возрастное ограничение -->
+<div class="mb-3">
+    <label for="editEventAge" class="form-label">Допустимый возраст</label>
+    <select class="form-select" id="editEventAge" name="min_age_category_id">
+        <option value="">Без ограничений</option>
+        {% for age in age_categories %}
+        <option value="{{ age.id }}"
+                {% if age.id == event.min_age_category_id %}selected{% endif %}>
+            {{ age.name }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="row g-3 mb-3">
+    <!-- Дата и время начала -->
+    <div class="col-md-6">
+        <label for="editEventStart" class="form-label">Дата и время начала</label>
+        <input type="datetime-local" class="form-control" id="editEventStart" name="start_time" 
+               value="{{ event.start_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </div>
+
+    <!-- Дата и время окончания -->
+    <div class="col-md-6">
+        <label for="editEventEnd" class="form-label">Дата и время окончания</label>
+        <input type="datetime-local" class="form-control" id="editEventEnd" name="end_time" 
+               value="{{ event.end_time.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </div>
+</div>
+
+<!-- Максимальное количество участников -->
+<div class="mb-3">
+    <label for="editEventParticipants" class="form-label">Максимальное количество участников</label>
+    <input type="number" class="form-control" id="editEventParticipants" name="max_participants" 
+           value="{{ event.max_participants }}" min="1" required>
+</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="submit" form="editEventForm" class="btn btn-primary">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно добавления участников -->
+<div class="modal fade" id="addParticipantsModal" tabindex="-1" aria-labelledby="addParticipantsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addParticipantsModalLabel">Добавление участников</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-3" id="employeeTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="internal-tab" data-bs-toggle="tab" data-bs-target="#internal" type="button">
+                            Внутренние сотрудники
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="external-tab" data-bs-toggle="tab" data-bs-target="#external" type="button">
+                            Внешние специалисты
+                        </button>
+                    </li>
+                </ul>
+
+                            <div class="tab-content">
+                <div class="tab-pane fade show active" id="internal">
+                    <div class="list-group overflow-auto" style="max-height: 300px;">
+                        {% for employee in all_employees if not employee.is_external and employee.id not in current_employee_ids %}
+                        <label class="list-group-item">
+                            <input class="form-check-input me-2 employee-checkbox" type="checkbox" value="{{ employee.id }}">
+                            {{ employee.full_name }} ({{ employee.position }})
+                        </label>
+                        {% else %}
+                        <div class="alert alert-info mb-0">Нет доступных сотрудников для добавления</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="external">
+                    <div class="list-group overflow-auto" style="max-height: 300px;">
+                        {% for employee in all_employees if employee.is_external and employee.id not in current_employee_ids %}
+                        <label class="list-group-item">
+                            <input class="form-check-input me-2 employee-checkbox" type="checkbox" value="{{ employee.id }}">
+                            {{ employee.full_name }} ({{ employee.position }})
+                        </label>
+                        {% else %}
+                        <div class="alert alert-info mb-0">Нет доступных сотрудников для добавления</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" onclick="addParticipants({{ event.id }})">Добавить выбранных</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function removeParticipant(eventId, employeeId) {
+    if (confirm('Вы уверены, что хотите удалить этого участника из мероприятия?')) {
+        fetch(`/events/${eventId}/participants/${employeeId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Ошибка при удалении участника');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при удалении участника');
+        });
+    }
+}
+function confirmDelete(eventId) {
+    if (confirm('Вы уверены, что хотите удалить это мероприятие? Это действие нельзя отменить.')) {
+        fetch(`/events/${eventId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/events';
+            } else {
+                alert('Ошибка при удалении мероприятия');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при удалении мероприятия');
+        });
+    }
+}
+function addParticipants(eventId) {
+    const selected = Array.from(document.querySelectorAll('.employee-checkbox:checked')).map(el => el.value);
+    
+    if (selected.length === 0) {
+        alert('Выберите хотя бы одного участника');
+        return;
+    }
+
+    // Создаем FormData и добавляем выбранных сотрудников
+    const formData = new FormData();
+    selected.forEach(id => {
+        formData.append('employee_ids', id);
+    });
+
+    fetch(`/events/${eventId}/participants`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Ошибка при добавлении участников');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ошибка при добавлении участников');
+    });
+}
+// Поиск сотрудников
+document.getElementById('employeeSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}
