@@ -125,7 +125,6 @@
             </div>
         </div>
     </div>
-
     <!-- Результаты отчета -->
     <div class="report-header mt-4 p-3 bg-light rounded">
         <h4><i class="bi bi-file-earmark-text"></i> Отчет о мероприятиях</h4>
@@ -174,7 +173,53 @@
         </ul>
     </nav>
 </div>
-
+<div class="row mt-8 justify-content-center" style="max-width: 100%;">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Распределение мероприятий по статусам</h5>
+            </div>
+            <div class="card-body position-relative" style="height: 500px; ">
+                <canvas id="statusChart" style="width: 100%; height: 100%;"></canvas>
+                <div id="statusChartPlaceholder" class="position-absolute top-50 start-50 translate-middle text-center text-muted">
+                    <i class="bi bi-bar-chart" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Данные не загружены</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Распределение по типам мероприятий</h5>
+            </div>
+            <div class="card-body position-relative" style="height: 500px;">
+                <canvas id="typeChart" style="width: 100%; height: 100%; justify-content: center; align-items: center;"></canvas>
+                <div id="typeChartPlaceholder" class="position-absolute top-50 start-50 translate-middle text-center text-muted">
+                    <i class="bi bi-pie-chart" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Данные не загружены</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-6 justify-content-center" style="max-width:100%;">
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-graph-up"></i> Мероприятия по дням</h5>
+        </div>
+        <div class="card-body position-relative" style="height: 500px;">
+            <canvas id="timelineChart"></canvas>
+            <div id="timelineChartPlaceholder" class="position-absolute top-50 start-50 translate-middle text-center text-muted">
+                <i class="bi bi-graph-up" style="font-size: 2rem;"></i>
+                <p class="mt-2">Данные не загружены</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+    
 <!-- Модальное окно экспорта -->
 <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -224,6 +269,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Устанавливаем даты по умолчанию (текущий месяц)
@@ -371,13 +417,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             row.innerHTML = `
                 <td class="text-center">${index + 1}</td>
-                <td class="text-left">${event.name || '—'}</td>
+                <td class="text-center">${event.name || '—'}</td>
                 <td class="text-center">${event.start_date || '—'} - ${event.end_date || '—'}</td>
                 <td class="text-center"><span class="badge ${statusClass}">${event.status || '—'}</span></td>
                 <td class="text-center">${event.age_category || '—'}</td>
                 <td class="text-center">${event.participants || '—'}</td>
-                <td class="text-left">${event.event_type || '—'}</td>
-                <td class="text-left">${event.room || '—'}</td>
+                <td class="text-center">${event.event_type || '—'}</td>
+                <td class="text-center">${event.room || '—'}</td>
             `;
             
             tbody.appendChild(row);
@@ -443,8 +489,216 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Показываем/скрываем пагинацию в зависимости от количества результатов
         document.getElementById('pagination').style.display = data.length > 15 ? 'block' : 'none';
+        updateCharts(data);
     }
     
+     // Инициализация диаграмм
+    let statusChart, typeChart, timelineChart;
+        // Скрываем заглушки при успешной инициализации
+        statusPlaceholder.style.display = 'none';
+        typePlaceholder.style.display = 'none';
+    function initCharts() {
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusPlaceholder = document.getElementById('statusChartPlaceholder');
+
+        statusChart = new Chart(statusCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Количество мероприятий',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} мероприятий`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        // Диаграмма типов мероприятий
+        const typeCtx = document.getElementById('typeChart').getContext('2d');
+        const typePlaceholder = document.getElementById('typeChartPlaceholder');
+        
+        typeChart = new Chart(typeCtx, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+const timelinePlaceholder = document.getElementById('timelineChartPlaceholder');
+
+timelineChart = new Chart(timelineCtx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Мероприятия по дням',
+            data: [],
+            fill: false,
+            borderColor: '#0d6efd',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false,
+                position: 'bottom'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+    }
+    
+function updateCharts(data) {
+    const statusPlaceholder = document.getElementById('statusChartPlaceholder');
+    const typePlaceholder = document.getElementById('typeChartPlaceholder');
+    const timelinePlaceholder = document.getElementById('timelineChartPlaceholder');
+    
+        if (!data || data.length === 0) {
+            // Показываем заглушки, если нет данных
+            statusPlaceholder.style.display = 'block';
+            typePlaceholder.style.display = 'block';
+            timelinePlaceholder.style.display = 'block';
+            
+            if (statusChart) statusChart.destroy();
+            if (typeChart) typeChart.destroy();
+            return;
+        }
+        statusPlaceholder.style.display = 'none';
+        typePlaceholder.style.display = 'none';
+        timelinePlaceholder.style.display = 'none';
+        if (!statusChart || !typeChart) {
+            initCharts();
+        }
+        
+        // Подготовка данных для диаграммы статусов
+        const statusCounts = {};
+        const typeCounts = {};
+        
+        data.forEach(event => {
+            // Статусы
+            const status = event.status || 'Не указано';
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+            
+            // Типы
+            const eventType = event.event_type || 'Не указано';
+            typeCounts[eventType] = (typeCounts[eventType] || 0) + 1;
+        });
+        
+        // Обновляем диаграмму статусов
+        statusChart.data.labels = Object.keys(statusCounts);
+        statusChart.data.datasets[0].data = Object.values(statusCounts);
+        statusChart.update();
+        
+        // Обновляем диаграмму типов
+        typeChart.data.labels = Object.keys(typeCounts);
+        typeChart.data.datasets[0].data = Object.values(typeCounts);
+        typeChart.update();
+
+        const dateCounts = {};
+    data.forEach(event => {
+        const date = event.start_date.split('T')[0]; // Упрощаем дату, если нужно
+        dateCounts[date] = (dateCounts[date] || 0) + 1;
+    });
+
+    // Сортируем даты
+    const sortedDates = Object.keys(dateCounts).sort();
+    const counts = sortedDates.map(date => dateCounts[date]);
+
+    // Обновляем график временного ряда
+    timelineChart.data.labels = sortedDates;
+    timelineChart.data.datasets[0].data = counts;
+    timelineChart.update();
+
+    }
+    
+    // Инициализация диаграмм при загрузке страницы
+    initCharts();
+
     // Функция форматирования даты (YYYY-MM-DD -> DD.MM.YYYY)
     function formatDate(dateString) {
         if (!dateString) return '';
@@ -458,6 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const modal = new bootstrap.Modal(document.getElementById('errorModal'));
         modal.show();
     }
+
 });
 </script>
 {% endblock %}

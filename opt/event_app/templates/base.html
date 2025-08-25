@@ -1,4 +1,5 @@
-<!-- Навигация -->
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,15 @@
     <!-- Подключение ваших стилей -->
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
+<body>
 <div class="container-fluid logo-fullwidth">
     <img src="/static/images/logo.svg" alt="Логотип">
     <div class="logo-text">
         Автоматизированная система управления культурно-массовыми мероприятиями
     </div>
 </div>
-{% if request.cookies.get("session_token") %}
+
+{% if current_user %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -34,9 +37,10 @@
                         <i class="bi bi-calendar-event"></i> Мероприятия
                     </a>
                 </li>
+                {% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if request.url.path == '/rooms' }}" href="/rooms">
-                        <i class="bi bi-bank"></i></i> Ресурсы
+                        <i class="bi bi-bank"></i> Ресурсы
                     </a>
                 </li>
                 <li class="nav-item">
@@ -44,26 +48,34 @@
                         <i class="bi bi-graph-up"></i> Деятельность
                     </a>
                 </li>
+                {% endif %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile">
+                    <a class="nav-link {{ 'active' if request.url.path == '/profile' }}" href="/profile">
                         <i class="bi bi-person-circle"></i> Профиль
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/?auth=false">
+                    <a class="nav-link" href="/logout">
                         <i class="bi bi-box-arrow-right"></i> Выйти
                     </a>
                 </li>
             </ul>
         </div>
+        
     </div>
+    <!-- Временная отладочная информация -->
+<div style="display: none;">
+    Current User: {{ current_user|tojson }}
+    Roles: {{ current_user.get('roles', [])|tojson }}
+</div>
 </nav>
-
 {% endif %}
 
-        {% block content %}{% endblock %}
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

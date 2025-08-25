@@ -52,6 +52,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        {% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}
                         <div class="col-md-6 mb-3">
                             <div class="card">
                                 <div class="card-body text-center">
@@ -61,7 +62,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        {% endif %}
+                        <div class="col-md-{% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}6{% else %}12{% endif %} mb-3">
                             <div class="card">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">Участие в мероприятиях</h6>
@@ -77,10 +79,17 @@
             <!-- Последние мероприятия -->
             <div class="card">
                 <div class="card-header bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Последние организованные мероприятия</h5>
-                        <a href="/events" class="btn btn-sm btn-outline-primary">Все мероприятия</a>
-                    </div>
+                    {% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Последние организованные мероприятия</h5>
+                            <a href="/events" class="btn btn-sm btn-outline-primary">Все мероприятия</a>
+                        </div>
+                    {% else %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Последние мероприятия с участием</h5>
+                            <a href="/events" class="btn btn-sm btn-outline-primary">Все мероприятия</a>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     {% if recent_events %}
@@ -93,11 +102,20 @@
                             </div>
                             <p class="mb-1 text-muted">{{ event.description|truncate(100) }}</p>
                             <small>{{ event.room_name if event.room_name else 'Место не указано' }}</small>
+                            {% if 'Сотрудник' in current_user.get('roles', [])%}
+                            <small class="text-muted">Роль: {{ event.participation_role or 'Участник' }}</small>
+                            {% endif %}
                         </a>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="alert alert-info mb-0">Вы еще не организовали ни одного мероприятия</div>
+                    <div class="alert alert-info mb-0">
+                        {% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}
+                            Вы еще не организовали ни одного мероприятия
+                        {% else %}
+                            Вы еще не участвовали ни в одном мероприятии
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -165,19 +183,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Маска для телефона (если добавим телефон в будущем)
-    const phoneInput = document.getElementById('phone');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
-            e.target.value = !x[2] ? x[1] : '+7 (' + x[2] + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
-        });
-    }
-});
-</script>
 {% endblock %}

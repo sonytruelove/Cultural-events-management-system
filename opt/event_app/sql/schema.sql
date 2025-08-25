@@ -17,9 +17,6 @@ DROP TABLE IF EXISTS age_categories CASCADE;
 -- Расширение для временных интервалов
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
--- Расширение для временных интервалов
-CREATE EXTENSION IF NOT EXISTS btree_gist;
-
 -- Классификаторы
 CREATE TABLE age_categories (
     id SERIAL PRIMARY KEY,
@@ -151,3 +148,9 @@ CREATE TABLE event_participants (
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (event_id, user_id)
 );
+
+-- Назначим администратору роль admin
+INSERT INTO user_roles (user_id, role_id) 
+SELECT u.id, r.id FROM users u, roles r 
+WHERE u.username = 'admin@eventsystem.com' AND r.name = 'Администратор'
+ON CONFLICT DO NOTHING;

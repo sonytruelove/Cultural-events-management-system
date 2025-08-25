@@ -9,9 +9,11 @@
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
             <i class="bi bi-funnel"></i>
         </button>
+        {% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createEventModal">
             <i class="bi bi-plus-lg"></i>
         </button>
+        {% endif %}
     </div>
 
     <!-- Карточки мероприятий -->

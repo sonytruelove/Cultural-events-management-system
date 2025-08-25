@@ -8,18 +8,20 @@ from datetime import datetime, timedelta
 import random
 from typing import Optional,List
 from passlib.context import CryptContext
-from .database import get_connection
+from database import get_connection
 from fastapi import UploadFile, File
 import os
 from pathlib import Path
 import json
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-UPLOAD_DIR = Path("app/static/images")
+
+UPLOAD_DIR = Path("/opt/event_app/static/images")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
+app.mount("/static", StaticFiles(directory="/opt/event_app/static"), name="static")
+templates = Jinja2Templates(directory="/opt/event_app/templates")
 
 
 ADMIN_USERNAME = "admin@eventsystem.com"
@@ -32,6 +34,40 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 password_reset_tokens = {}
+
+security = HTTPBearer()
+
+
+async def get_current_user_role(request: Request):
+    """Получаем текущего пользователя и его роли"""
+    current_user = await get_current_user(request)
+    conn = await get_connection()
+    try:
+        roles = await conn.fetch(
+            "SELECT r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = $1",
+            current_user['id']
+        )
+        return {"user": current_user, "roles": [r['name'] for r in roles]}
+    finally:
+        await conn.close()
+        
+def role_required(required_roles: list):
+    async def _role_checker(request: Request):
+        """Фабрика зависимостей для проверки ролей"""
+        user_data = await get_current_user_role(request)
+        user_roles = user_data["roles"]
+        
+        if 'Администратор' in user_roles:
+            return user_data
+        
+        if not any(role in user_roles for role in required_roles):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения этого действия"
+            )
+        
+        return user_data
+    return _role_checker
 
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
@@ -47,12 +83,14 @@ async def create_admin_user():
             "SELECT * FROM users WHERE username = $1", ADMIN_USERNAME
         )
         if not admin:
+            admin_id = await conn.fetchval(
+                "INSERT INTO users (username, password_hash, full_name, email) VALUES ($1, $2, $3, $4) RETURNING id",
+                ADMIN_USERNAME, get_password_hash(ADMIN_PASSWORD), ADMIN_NAME, ADMIN_EMAIL
+            )
+            
             await conn.execute(
-                "INSERT INTO users (username, password_hash, full_name, email) VALUES ($1, $2, $3, $4)",
-                ADMIN_USERNAME,
-                get_password_hash(ADMIN_PASSWORD),
-                ADMIN_NAME,
-                ADMIN_EMAIL
+                "INSERT INTO user_roles (user_id, role_id) VALUES ($1, (SELECT id FROM roles WHERE name = 'Администратор'))",
+                admin_id
             )
     finally:
         await conn.close()
@@ -73,13 +111,17 @@ async def get_upcoming_events(conn):
     except Exception as e:
         print(f"Ошибка получения мероприятий: {e}")
         return []
-
+    
 async def get_current_user(request: Request):
     """Получение текущего пользователя из сессии"""
     session_token = request.cookies.get("session_token")
+    print(f"Получен session_token из cookie: {session_token}")
+    
     if not session_token:
+        print("Сессионный токен отсутствует")
         raise HTTPException(
-            status_code=status.HTTP_303_SEE_OTHER,
+            status_code=303,
+            detail="Not authenticated",
             headers={"Location": "/unregistered"}
         )
     
@@ -91,11 +133,16 @@ async def get_current_user(request: Request):
             "WHERE us.session_token = $1 AND us.expires_at > NOW()",
             session_token
         )
+        
         if not user:
+            print(f"Сессия не найдена или истекла: {session_token}")
             raise HTTPException(
-                status_code=status.HTTP_303_SEE_OTHER,
-                headers={"Location": "/unregistered"}
-            )
+            status_code=303,
+            detail="Not authenticated",
+            headers={"Location": "/unregistered"}
+        )
+            
+        print(f"Пользователь найден: {user['username']}")
         return dict(user)
     finally:
         await conn.close()
@@ -114,7 +161,11 @@ async def startup():
                 expires_at TIMESTAMP NOT NULL
             )
         """)
+        print("Таблица user_sessions создана/проверена")
         await create_admin_user()
+    except Exception as e:
+        print(f"Ошибка при создании таблицы сессий: {e}")
+        raise
     finally:
         await conn.close()
 
@@ -126,6 +177,8 @@ async def login(
     remember: bool = Form(False)
 ):
     """Обработка входа в систему"""
+    print(f"Попытка входа: {username}")
+    
     conn = await get_connection()
     try:
         user = await conn.fetchrow(
@@ -133,12 +186,13 @@ async def login(
             username
         )
         
-        if not user or not verify_password(password, user["password_hash"]):
+        if not user:
+            print(f"Пользователь {username} не найден")
             return templates.TemplateResponse(
                 "unregistered.html",
                 {
                     "request": request,
-                    "error": "Неверный логин или пароль",
+                    "error": "Пользователь не найден",
                     "show_login_modal": True,
                     "admin_username": ADMIN_USERNAME,
                     "admin_password": ADMIN_PASSWORD
@@ -146,6 +200,21 @@ async def login(
                 status_code=401
             )
         
+        if not verify_password(password, user["password_hash"]):
+            print(f"Неверный пароль для пользователя {username}")
+            return templates.TemplateResponse(
+                "unregistered.html",
+                {
+                    "request": request,
+                    "error": "Неверный пароль",
+                    "show_login_modal": True,
+                    "admin_username": ADMIN_USERNAME,
+                    "admin_password": ADMIN_PASSWORD
+                },
+                status_code=401
+            )
+        
+        print(f"Успешная аутентификация для пользователя {username}")
         
         session_token = secrets.token_hex(32)
         expires_at = datetime.now() + timedelta(days=7 if remember else 1)
@@ -157,22 +226,27 @@ async def login(
             expires_at
         )
         
+        print(f"Сессия создана для user_id: {user['id']}")
+        
         response = RedirectResponse(url="/", status_code=303)
         response.set_cookie(
             key="session_token",
             value=session_token,
             max_age=3600*24*7 if remember else None,
             httponly=True,
-            secure=True
+            secure=False
         )
+        
+        print(f"Cookie установлен: {session_token}")
         return response
+        
     except Exception as e:
         print(f"Ошибка входа: {e}")
         return templates.TemplateResponse(
             "unregistered.html",
             {
                 "request": request,
-                "error": "Ошибка сервера при входе",
+                "error": f"Ошибка сервера при входе: {str(e)}",
                 "show_login_modal": True,
                 "admin_username": ADMIN_USERNAME,
                 "admin_password": ADMIN_PASSWORD
@@ -366,14 +440,30 @@ async def logout():
     response.delete_cookie("session_token")
     return response
 
-@app.get("/")
-async def root(request: Request):
+@app.get("/", response_class=HTMLResponse)
+async def root(
+    request: Request,
+    user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
+):
     """Главная страница для авторизованных пользователей"""
     try:
+        # Временно убираем проверку ролей
+        # user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
+        
+        # Получаем пользователя без проверки ролей
         current_user = await get_current_user(request)
+        
+        # Получаем роли пользователя
+        conn = await get_connection()
+        roles = await conn.fetch(
+            "SELECT r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = $1",
+            current_user['id']
+        )
+        user_roles = [r['name'] for r in roles]
+        current_user['roles'] = user_roles
+        
         conn = await get_connection()
         events = await get_upcoming_events(conn)
-        
         
         formatted_events = []
         for e in events:
@@ -412,11 +502,14 @@ async def root(request: Request):
             await conn.close()
         
 @app.get("/activity")
-async def activity(request: Request):
+async def activity(
+    request: Request,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
     """Страница отчетов о деятельности организации"""
     try:
-        current_user = await get_current_user(request)
-        
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         
         conn = await get_connection()
         try:
@@ -451,6 +544,7 @@ async def activity(request: Request):
             {"request": request, "error": "Ошибка загрузки данных"},
             status_code=500
         )
+
 @app.post("/api/activity/report")
 async def generate_activity_report(
     request: Request,
@@ -458,11 +552,13 @@ async def generate_activity_report(
     end_date: str = Form(...),
     event_id: Optional[str] = Form(None),
     filter_type: Optional[str] = Form(None),
-    filter_value: Optional[str] = Form(None)
+    filter_value: Optional[str] = Form(None),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
 ):
     """Генерация отчета о деятельности"""
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -548,10 +644,15 @@ async def generate_activity_report(
     finally:
         if 'conn' in locals():
             await conn.close()
+            
 @app.get("/profile")
-async def profile(request: Request):
+async def profile(
+    request: Request,
+    user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
+):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -613,11 +714,13 @@ async def profile(request: Request):
 async def update_profile(
     request: Request,
     full_name: str = Form(...),
-    email: str = Form(...)
+    email: str = Form(...),
+    user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
 ):
     """Обновление данных профиля"""
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         await conn.execute(
@@ -643,7 +746,8 @@ async def change_password(
     request: Request,
     current_password: str = Form(...),
     new_password: str = Form(...),
-    confirm_password: str = Form(...)
+    confirm_password: str = Form(...),
+    user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
 ):
     """Смена пароля пользователя"""
     try:
@@ -653,7 +757,8 @@ async def change_password(
         if len(new_password) < 8:
             raise HTTPException(status_code=400, detail="Пароль должен содержать не менее 8 символов")
         
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -692,9 +797,14 @@ async def change_password(
             await conn.close()
             
 @app.get("/events/{event_id}/edit")
-async def edit_event_form(request: Request, event_id: int):
+async def edit_event_form(
+    request: Request, 
+    event_id: int,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -778,10 +888,12 @@ async def update_event(
     start_time: str = Form(...),
     end_time: str = Form(...),
     min_age_category_id: Optional[int] = Form(None),
-    max_participants: int = Form(...)
+    max_participants: int = Form(...),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
 ):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -848,10 +960,12 @@ async def update_event(
 async def add_event_participants(
     request: Request,
     event_id: int,
-    employee_ids: List[int] = Form(...)
+    employee_ids: List[int] = Form(...),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
 ):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -890,10 +1004,12 @@ async def add_event_participants(
 async def remove_event_participant(
     request: Request,
     event_id: int,
-    employee_id: int
+    employee_id: int,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
 ):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -912,12 +1028,14 @@ async def remove_event_participant(
         if 'conn' in locals():
             await conn.close()
 
-
-
 @app.get("/employees")
-async def employees(request: Request):
+async def employees(
+    request: Request,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         employees = await conn.fetch("SELECT * FROM employees ORDER BY full_name")
         
@@ -937,9 +1055,14 @@ async def employees(request: Request):
         await conn.close()
 
 @app.delete("/employees/{employee_id}")
-async def delete_employee(request: Request, employee_id: int):
+async def delete_employee(
+    request: Request, 
+    employee_id: int,
+    user_data: dict = Depends(role_required(['Администратор']))
+):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         await conn.execute("DELETE FROM employees WHERE id = $1", employee_id)
@@ -957,10 +1080,12 @@ async def events(
     date: Optional[str] = None,
     event_type: Optional[str] = None,
     status: Optional[str] = None,
-    show_modal: Optional[bool] = False
+    show_modal: Optional[bool] = False,
+    user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
 ):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
         
@@ -1032,11 +1157,15 @@ async def events(
             await conn.close()
 
 @app.get("/events/create", name="create_event")
-async def create_event_form(request: Request):
+async def create_event_form(
+    request: Request,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
     try:
-        current_user = await get_current_user(request)
-        conn = await get_connection()
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         
+        conn = await get_connection()
         
         event_types = await conn.fetch("SELECT * FROM event_types ORDER BY name")
         rooms = await conn.fetch("SELECT * FROM rooms ORDER BY name")
@@ -1063,7 +1192,6 @@ async def create_event_form(request: Request):
 @app.delete("/events/{event_id}")
 async def delete_event(request: Request, event_id: int):
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
         
@@ -1089,7 +1217,7 @@ async def delete_event(request: Request, event_id: int):
     finally:
         if 'conn' in locals():
             await conn.close()
-            
+                        
 @app.post("/events/create")
 async def create_event(
     request: Request,
@@ -1101,14 +1229,15 @@ async def create_event(
     end_time: str = Form(...),
     min_age_category_id: Optional[int] = Form(None),
     max_participants: int = Form(...),
-    employee_ids: List[int] = Form([])
+    employee_ids: List[int] = Form([]),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
 ):
     """Добавление помещения (внутреннего или внешнего)"""
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
-        
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         start_datetime = datetime.fromisoformat(start_time)
         end_datetime = datetime.fromisoformat(end_time)
         
@@ -1185,12 +1314,17 @@ async def create_event(
     finally:
         if 'conn' in locals():
             await conn.close()
+            
 @app.get("/events/{event_id}", name="event_details")
-async def event_details(request: Request, event_id: int):
+async def event_details(
+    request: Request,  # Добавляем request как первый параметр
+    event_id: int,     # Параметр пути
+    user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор'])) 
+):
     try:
-        current_user = await get_current_user(request)
-        conn = await get_connection()
-        
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
+        conn = await get_connection()     
         event = await conn.fetchrow(
             """SELECT 
                   e.id, e.name, e.description, e.start_time, e.end_time, 
@@ -1258,21 +1392,13 @@ async def event_details(request: Request, event_id: int):
         if 'conn' in locals():
             await conn.close()
 
-@app.get("/external")
-async def external(request: Request):
-    try:
-        current_user = await get_current_user(request)
-        return templates.TemplateResponse(
-            "external.html",
-            {"request": request, "current_user": current_user}
-        )
-    except HTTPException:
-        return RedirectResponse(url="/unregistered")
-
 @app.get("/activity")
-async def external(request: Request):
+async def external(request: Request,
+                   user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+                   ):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         return templates.TemplateResponse(
             "activity.html",
             {"request": request, "current_user": current_user}
@@ -1281,9 +1407,13 @@ async def external(request: Request):
         return RedirectResponse(url="/unregistered")
 
 @app.get("/rooms")
-async def rooms(request: Request):
+async def rooms(request: Request,
+                user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
     try:
-        current_user = await get_current_user(request)
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
+        
         conn = await get_connection()
         
         rooms = await conn.fetch("""
@@ -1325,11 +1455,12 @@ async def rooms(request: Request):
         
 
 @app.get("/rooms/{room_id}")
-async def room_details(request: Request, room_id: int):
+async def room_details(request: Request, room_id: int,
+                       user_data: dict = Depends(role_required(['Организатор', 'Администратор']))):
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
-        
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
         room = await conn.fetchrow(
             """SELECT r.*, rt.name as room_type_name 
                FROM rooms r
@@ -1373,7 +1504,6 @@ async def room_details(request: Request, room_id: int):
 @app.delete("/rooms/{room_id}")
 async def delete_room(request: Request, room_id: int):
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
         
@@ -1431,7 +1561,6 @@ async def unregistered(
 async def sync_external_resources(request: Request):
     """Синхронизация внешних ресурсов (специалистов и помещений)"""
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
         
@@ -1525,7 +1654,7 @@ async def sync_flamp_venues(conn):
 async def parse_flamp_venue(url: str = Form(...)):
     """Парсинг помещения с flamp.ru"""
     try:
-        from .parsers.flamp_parser import parse_flamp_venue, format_for_db
+        from parsers.flamp_parser import parse_flamp_venue, format_for_db
         result = parse_flamp_venue(url)
         if not result:
             return {"success": False, "error": "Не удалось распарсить заведение"}
@@ -1540,7 +1669,7 @@ async def parse_flamp_venue(url: str = Form(...)):
 async def parse_hh_resume(url: str = Form(...)):
     """Парсинг резюме с hh.ru"""
     try:
-        from .parsers.hh_parser import parse_hh_resume, format_for_db
+        from parsers.hh_parser import parse_hh_resume, format_for_db
         result = parse_hh_resume(url)
         if not result:
             return {"success": False, "error": "Не удалось распарсить резюме"}
@@ -1550,7 +1679,8 @@ async def parse_hh_resume(url: str = Form(...)):
     except Exception as e:
         print(f"Error parsing hh resume: {e}")
         return {"success": False, "error": str(e)}
-    
+
+
 @app.post("/rooms/add")
 async def add_room(
     request: Request,
@@ -1568,7 +1698,6 @@ async def add_room(
     image_filename = None  
     
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
         
@@ -1634,7 +1763,6 @@ async def add_employee(
 ):
     """Добавление сотрудника (внутреннего или внешнего)"""
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
         
@@ -1679,7 +1807,6 @@ async def update_employee(
 ):
     """Обновление данных сотрудника"""
     try:
-        current_user = await get_current_user(request)
         conn = await get_connection()
         
         await conn.execute(

@@ -9,20 +9,41 @@ import random
 
 load_dotenv()
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-async def init_db():
+async def drop_tables(conn):
+    """Удаление всех таблиц в базе данных"""
+    try:
+        await conn.execute("""
+            DROP TABLE IF EXISTS resource_bookings CASCADE;
+            DROP TABLE IF EXISTS user_roles CASCADE;
+            DROP TABLE IF EXISTS events CASCADE;
+            DROP TABLE IF EXISTS rooms CASCADE;
+            DROP TABLE IF EXISTS employees CASCADE;
+            DROP TABLE IF EXISTS users CASCADE;
+            DROP TABLE IF EXISTS roles CASCADE;
+            DROP TABLE IF EXISTS age_categories CASCADE;
+            DROP TABLE IF EXISTS event_statuses CASCADE;
+            DROP TABLE IF EXISTS room_types CASCADE;
+            DROP TABLE IF EXISTS event_types CASCADE;
+        """)
+        print("All tables dropped successfully")
+    except Exception as e:
+        print(f"Error dropping tables: {e}")
+        raise
+
+async def init_db(recreate=False):
     database_url = os.getenv("DATABASE_URL")
     if not database_url:
         raise ValueError("DATABASE_URL environment variable is not set")
-    
     
     database_url = database_url.replace("postgresql+asyncpg://", "postgres://")
     
     conn = await asyncpg.connect(database_url)
     
     try:
+        if recreate:
+            await drop_tables(conn)
         
         sql_path = Path(__file__).parent / "sql" / "schema.sql"
         with open(sql_path, encoding='utf-8') as f:
@@ -30,7 +51,6 @@ async def init_db():
         
         await conn.execute(sql)
         print("Database schema initialized successfully")
-        
         
         await add_test_data(conn)
         
@@ -45,21 +65,21 @@ async def add_test_data(conn):
     print("Adding test data...")
     
     try:
-        
+        # Добавление ролей
         await conn.execute("""
             INSERT INTO roles (name) VALUES 
-            ('Администратор'), ('Организатор'), ('Координатор'), ('Участник')
+            ('Администратор'), ('Организатор'), ('Сотрудник'), ('Пользователь')
             ON CONFLICT DO NOTHING;
         """)
         
-        
+        # Добавление пользователей
         users_data = [
             ('admin@example.com', 'admin123', 'Администратор Системы', 'admin@example.com'),
-            ('org1@example.com', 'org1123', 'Иванова Мария Петровна', 'org1@example.com'),
-            ('org2@example.com', 'org2123', 'Смирнов Алексей Владимирович', 'org2@example.com'),
-            ('coord1@example.com', 'coord1123', 'Петров Дмитрий Иванович', 'coord1@example.com')
+            ('org1@example.com', 'org123', 'Иванова Мария Петровна', 'org1@example.com'),
+            ('org2@example.com', 'org123', 'Смирнов Алексей Владимирович', 'org2@example.com'),
+            ('coord1@example.com', 'coord123', 'Петров Дмитрий Иванович', 'coord1@example.com')
         ]
-        
+
         for username, password, full_name, email in users_data:
             await conn.execute("""
                 INSERT INTO users (username, password_hash, full_name, email) VALUES
@@ -67,7 +87,7 @@ async def add_test_data(conn):
                 ON CONFLICT DO NOTHING;
             """, username, pwd_context.hash(password), full_name, email)
         
-        
+        # Назначение ролей пользователям
         await conn.execute("""
             INSERT INTO user_roles (user_id, role_id) VALUES
             ((SELECT id FROM users WHERE username = 'admin@example.com'), 
@@ -77,25 +97,25 @@ async def add_test_data(conn):
             ((SELECT id FROM users WHERE username = 'org2@example.com'), 
              (SELECT id FROM roles WHERE name = 'Организатор')),
             ((SELECT id FROM users WHERE username = 'coord1@example.com'), 
-             (SELECT id FROM roles WHERE name = 'Координатор'))
+             (SELECT id FROM roles WHERE name = 'Сотрудник'))
             ON CONFLICT DO NOTHING;
         """)
         
-        
+        # Добавление возрастных категорий
         await conn.execute("""
             INSERT INTO age_categories (name) VALUES 
             ('0+'), ('6+'), ('12+'), ('16+'), ('18+'), ('21+')
             ON CONFLICT DO NOTHING;
         """)
         
-        
+        # Добавление статусов мероприятий
         await conn.execute("""
             INSERT INTO event_statuses (name) VALUES 
             ('Запланировано'), ('Активно'), ('Завершено'), ('Отменено')
             ON CONFLICT DO NOTHING;
         """)
         
-        
+        # Добавление типов помещений
         await conn.execute("""
             INSERT INTO room_types (name) VALUES 
             ('Конференц-зал'), ('Тренинг-зал'), ('Коворкинг'), 
@@ -105,7 +125,7 @@ async def add_test_data(conn):
             ON CONFLICT DO NOTHING;
         """)
         
-        
+        # Добавление типов мероприятий
         await conn.execute("""
             INSERT INTO event_types (name, category) VALUES 
             ('Конференция', 'Научное'), ('Форум', 'Научное'), ('Семинар', 'Научное'),
@@ -117,7 +137,7 @@ async def add_test_data(conn):
             ON CONFLICT DO NOTHING;
         """)
         
-        
+        # Добавление помещений
         rooms_data = [
             ('Синий зал Дом молодежи', 'Конференц-зал', 500, 'ул. Ленина, 1', 'Большой конференц-зал с проектором и звуковым оборудованием', 'blue_hall.jpg'),
             ('Красный зал Дом молодежи', 'Конференц-зал', 150, 'ул. Ленина, 1', 'Малый конференц-зал для переговоров', 'red_hall.jpg'),
@@ -138,7 +158,7 @@ async def add_test_data(conn):
             ON CONFLICT DO NOTHING;
         """, name, room_type, capacity, address, description, image_filename)
         
-        
+        # Добавление сотрудников
         employees_data = [
             ('Иванов Алексей Петрович', 'Менеджер проектов', 'ivanov@example.com', False),
             ('Петрова Светлана Михайловна', 'Дизайнер мероприятий', 'petrova@example.com', False),
@@ -151,7 +171,8 @@ async def add_test_data(conn):
             ('Лебедев Игорь Олегович', 'Видеооператор', 'lebedev@example.com', True),
             ('Соколова Ольга Игоревна', 'Ведущий мероприятий', 'sokolova@example.com', True),
             ('Козлов Михаил Андреевич', 'Звукорежиссер', 'kozlov@example.com', True),
-            ('Новикова Татьяна Викторовна', 'Декоратор', 'novikova@example.com', True)
+            ('Новикова Татьяна Викторовна', 'Декоратор', 'novikova@example.com', True),
+            ('Петров Дмитрий Иванович', 'Координатор мероприятий', 'coord1@example.com', False)  # Добавлен как сотрудник
         ]
         
         for full_name, position, contact_info, is_external in employees_data:
@@ -161,7 +182,7 @@ async def add_test_data(conn):
                 ON CONFLICT DO NOTHING;
             """, full_name, position, contact_info, is_external)
         
-        
+        # Добавление мероприятий (Петров Д.И. не является организатором ни одного мероприятия)
         events_data = [
             ('Технологическая конференция "Цифровой Байкал"', 
              'Ежегодная конференция, посвященная новейшим технологическим тенденциям и инновациям в IT-сфере. В программе: выступления ведущих экспертов, мастер-классы, нетворкинг.',
@@ -181,11 +202,11 @@ async def add_test_data(conn):
             
             ('Выставка современного искусства "Арт-Волна"', 
              'Выставка работ молодых художников и скульпторов с интерактивными инсталляциями и мастер-классами.',
-             datetime(2025, 3, 10, 11, 0), datetime(2025, 3, 20, 19, 0), 100, '12+', 'Активно', 'Выставка', 'coord1@example.com'),
+             datetime(2025, 3, 10, 11, 0), datetime(2025, 3, 20, 19, 0), 100, '12+', 'Активно', 'Выставка', 'org1@example.com'),
             
             ('Турнир по настольному теннису', 
              'Ежегодный турнир среди сотрудников компаний-партнеров с призовым фондом и развлекательной программой.',
-             datetime(2025, 6, 12, 9, 0), datetime(2025, 6, 12, 18, 0), 50, '16+', 'Запланировано', 'Турнир', 'coord1@example.com'),
+             datetime(2025, 6, 12, 9, 0), datetime(2025, 6, 12, 18, 0), 50, '16+', 'Запланировано', 'Турнир', 'org2@example.com'),
             
             ('Лекция "Будущее искусственного интеллекта"', 
              'Популярная лекция от ведущего эксперта в области ИИ о перспективах развития технологии и ее влиянии на общество.',
@@ -209,7 +230,7 @@ async def add_test_data(conn):
             """, name, description, start_time, end_time, max_participants, 
                age_category, status, event_type, organizer)
         
-        
+        # Привязка помещений к мероприятиям
         event_rooms = [
             ('Технологическая конференция "Цифровой Байкал"', 'Синий зал Дом молодежи'),
             ('Корпоративный новогодний праздник', 'Красный зал Дом молодежи'),
@@ -238,16 +259,16 @@ async def add_test_data(conn):
                 )
             """, event_name, room_name)
         
-        
+        # Привязка сотрудников к мероприятиям (Петров Д.И. участвует в нескольких мероприятиях)
         event_employees = [
-            ('Технологическая конференция "Цифровой Байкал"', ['Иванов Алексей Петрович', 'Петрова Светлана Михайловна', 'Смирнов Виктор Константинович', 'Волкова Анна Дмитриевна']),
+            ('Технологическая конференция "Цифровой Байкал"', ['Иванов Алексей Петрович', 'Петрова Светлана Михайловна', 'Смирнов Виктор Константинович', 'Волкова Анна Дмитриевна', 'Петров Дмитрий Иванович']),
             ('Корпоративный новогодний праздник', ['Иванов Алексей Петрович', 'Сидоров Дмитрий Владимирович', 'Соколова Ольга Игоревна', 'Козлов Михаил Андреевич']),
-            ('Мастер-класс по проектному управлению', ['Иванов Алексей Петрович', 'Кузнецова Елена Леонидовна', 'Орлова Мария Сергеевна']),
+            ('Мастер-класс по проектному управлению', ['Иванов Алексей Петрович', 'Кузнецова Елена Леонидовна', 'Орлова Мария Сергеевна', 'Петров Дмитрий Иванович']),
             ('Фестиваль молодежных инициатив', ['Петрова Светлана Михайловна', 'Кузнецова Елена Леонидовна', 'Волкова Анна Дмитриевна', 'Лебедев Игорь Олегович']),
-            ('Выставка современного искусства "Арт-Волна"', ['Новикова Татьяна Викторовна', 'Волкова Анна Дмитриевна']),
-            ('Турнир по настольному теннису', ['Сидоров Дмитрий Владимирович']),
+            ('Выставка современного искусства "Арт-Волна"', ['Новикова Татьяна Викторовна', 'Волкова Анна Дмитриевна', 'Петров Дмитрий Иванович']),
+            ('Турнир по настольному теннису', ['Сидоров Дмитрий Владимирович', 'Петров Дмитрий Иванович']),
             ('Лекция "Будущее искусственного интеллекта"', ['Жуков Павел Александрович', 'Соколова Ольга Игоревна']),
-            ('Тренинг "Эффективные коммуникации"', ['Орлова Мария Сергеевна', 'Кузнецова Елена Леонидовна'])
+            ('Тренинг "Эффективные коммуникации"', ['Орлова Мария Сергеевна', 'Кузнецова Елена Леонидовна', 'Петров Дмитрий Иванович'])
         ]
         
         for event_name, employees in event_employees:
@@ -275,4 +296,4 @@ async def add_test_data(conn):
         raise
 
 if __name__ == "__main__":
-    asyncio.run(init_db())
+    asyncio.run(init_db(recreate=True))
