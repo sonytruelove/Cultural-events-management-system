@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <!-- Подключение Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Подключение Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Подключение ваших стилей -->
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
@@ -63,7 +60,6 @@
         </div>
         
     </div>
-    <!-- Временная отладочная информация -->
 <div style="display: none;">
     Current User: {{ current_user|tojson }}
     Roles: {{ current_user.get('roles', [])|tojson }}

@@ -68,7 +68,7 @@
                     {% if events %}
                     <div class="list-group">
                         {% for event in events %}
-                        <a href="{{ url_for('event_details', event_id=event.id) }}" class="list-group-item list-group-item-action">
+                        <a href="{{ url_for('edit_room_form', room_id=room.id) }}" class="btn btn-outline-primary me-2">
                             <div class="d-flex justify-content-between">
                                 <h6>{{ event.name }}</h6>
                                 <span class="text-muted">{{ event.start_time.strftime('%d.%m.%Y %H:%M') }}</span>
@@ -86,7 +86,6 @@
     </div>
 </div>
 
-<!-- Модальное окно подтверждения удаления -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -107,10 +106,8 @@
 
 {% block scripts %}
 <script>
-    // Глобальные переменные для удаления
     let roomToDelete = null;
     
-    // Функция подтверждения удаления помещения
     function confirmDeleteRoom(roomId, roomName) {
         roomToDelete = roomId;
         document.getElementById('deleteConfirmationText').textContent = 
@@ -120,14 +117,12 @@
         deleteModal.show();
     }
     
-    // Обработчик подтверждения удаления
     document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (roomToDelete) {
             deleteRoom(roomToDelete);
         }
     });
     
-    // Функция удаления помещения
     function deleteRoom(roomId) {
         fetch(`/rooms/${roomId}`, {
             method: 'DELETE',

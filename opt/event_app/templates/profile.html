@@ -134,16 +134,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Текущий пароль</label>
+                        <label for="currentPassword" class="form-label fw-bold">Текущий пароль</label>
                         <input type="password" class="form-control" id="currentPassword" name="current_password" required>
                     </div>
                     <div class="mb-3">
-                        <label for="newPassword" class="form-label">Новый пароль</label>
+                        <label for="newPassword" class="form-label fw-bold">Новый пароль</label>
                         <input type="password" class="form-control" id="newPassword" name="new_password" required>
                         <div class="form-text">Пароль должен содержать не менее 8 символов</div>
                     </div>
                     <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Подтвердите новый пароль</label>
+                        <label for="confirmPassword" class="form-label fw-bold">Подтвердите новый пароль</label>
                         <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
                     </div>
                 </div>
@@ -167,11 +167,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="fullName" class="form-label">ФИО</label>
+                        <label for="fullName" class="form-label fw-bold">ФИО</label>
                         <input type="text" class="form-control" id="fullName" name="full_name" value="{{ current_user.full_name }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
+                        <label for="email" class="form-label fw-bold">Email</label>
                         <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
                     </div>
                 </div>

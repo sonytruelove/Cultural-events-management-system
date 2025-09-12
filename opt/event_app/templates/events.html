@@ -4,7 +4,6 @@
 <div class="container mt-4">
     <h1 class="mb-4">Мероприятия</h1>
 
-    <!-- Кнопки действий -->
     <div class="d-flex justify-content-end mb-4 action-buttons gap-2">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
             <i class="bi bi-funnel"></i>
@@ -16,44 +15,63 @@
         {% endif %}
     </div>
 
-    <!-- Карточки мероприятий -->
-    <div class="row">
-        {% for event in events %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    {% if event.status_name == 'Активно' %}
-                        <i class="bi bi-lightning-charge-fill event-status status-active" title="Активно"></i>
-                    {% elif event.status_name == 'Завершено' %}
-                        <i class="bi bi-check-circle-fill event-status status-completed" title="Состоялось"></i>
-                    {% elif event.status_name == 'Отменено' %}
-                        <i class="bi bi-x-circle-fill event-status status-cancelled" title="Не состоялось"></i>
-                    {% elif event.status_name == 'Запланировано' %}
-                        <i class="bi bi-calendar-check-fill event-status status-planned" title="Запланировано"></i>
-                    {% endif %}
-                    <h5 class="card-title">{{ event.name }}</h5>
-                    <p class="card-text">{{ event.description }}</p>
-                    <p class="card-text"><small class="text-muted">
-                        {{ event.start_time.strftime('%d.%m.%Y') }} - {{ event.end_time.strftime('%d.%m.%Y') }}
-                    </small></p>
-                    <p class="card-text">Допустимый возраст: <strong>{{ event.age_category_name if event.age_category_name else 'Без ограничений' }}</strong></p>
-                    <p class="card-text">Количество человек: <strong>до {{ event.max_participants }}</strong></p>
-                    <p class="card-text"><i class="bi bi-calendar-event"></i> <strong>{{ event.event_type_name }}</strong></p>
-                    <p class="card-text"><i class="bi bi-building"></i> <strong>{{ event.room_name if event.room_name else 'Помещение не указано' }}</strong></p>
-                    <a href="{{ url_for('event_details', event_id=event.id) }}" class="btn btn-sm btn-outline-primary">Подробнее</a>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="col-12">
-            <div class="alert alert-info">Нет мероприятий</div>
-        </div>
-        {% endfor %}
+    <div class="table-responsive">
+        <table class="table table-hover" id="eventsTable">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center" data-sort="name">Название</th>
+                    <th class="text-center" data-sort="event_type_name">Тип мероприятия</th>
+                    <th class="text-center" data-sort="start_time">Дата начала</th>
+                    <th class="text-center" data-sort="end_time">Дата окончания</th>
+                    <th class="text-center" data-sort="max_participants">Участников (до)</th>
+                    <th class="text-center" data-sort="age_category_name">Возраст</th>
+                    <th class="text-center" data-sort="room_name">Помещение</th>
+                    <th class="text-center" data-sort="status_name">Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.event_type_name }}</td>
+                    <td>{{ event.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td>{{ event.end_time.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td class="text-end">{{ event.max_participants }}</td>
+                    <td class="text-center">{{ event.age_category_name if event.age_category_name else 'Без ограничений' }}</td>
+                    <td>{{ event.room_name if event.room_name else '—' }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if event.status_name == 'Активно' %}bg-success
+                            {% elif event.status_name == 'Завершено' %}bg-secondary
+                            {% elif event.status_name == 'Отменено' %}bg-danger
+                            {% elif event.status_name == 'Запланировано' %}bg-primary
+                            {% else %}bg-light text-dark{% endif %}">
+                            {{ event.status_name }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('event_details', event_id=event.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-info-circle"></i>
+                        </a>
+                        {% if 'Организатор' in current_user.get('roles', []) or 'Администратор' in current_user.get('roles', []) %}
+                        <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteEvent({{ event.id }}, '{{ event.name }}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">Мероприятия не найдены</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Модальное окно для фильтров -->
-<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+<div class="modal fade modal-sm" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -63,12 +81,12 @@
             <div class="modal-body">
                 <form action="{{ url_for('events') }}" method="get">
                     <div class="mb-3">
-                        <label for="dateFilter" class="form-label">Дата</label>
-                        <input type="date" class="form-control" id="dateFilter" name="date">
+                        <label for="dateFilter" class="form-label fw-bold fw-bold">Дата</label>
+                        <input type="date" class="form-control w-auto" id="dateFilter" name="date">
                     </div>
                     <div class="mb-3">
-                        <label for="typeFilter" class="form-label">Тип мероприятия</label>
-                        <select class="form-select" id="typeFilter" name="event_type">
+                        <label for="typeFilter" class="form-label fw-bold fw-bold">Тип мероприятия</label>
+                        <select class="form-select w-auto" id="typeFilter" name="event_type">
                             <option value="">Все</option>
                             {% for event_type in event_types %}
                             <option value="{{ event_type.id }}">{{ event_type.name }}</option>
@@ -76,8 +94,8 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="statusFilter" class="form-label">Статус</label>
-                        <select class="form-select" id="statusFilter" name="status">
+                        <label for="statusFilter" class="form-label fw-bold fw-bold">Статус</label>
+                        <select class="form-select w-auto" id="statusFilter" name="status">
                             <option value="">Все</option>
                             {% for status in event_statuses %}
                             <option value="{{ status.id }}">{{ status.name }}</option>
@@ -91,9 +109,7 @@
     </div>
 </div>
 
-<!-- Модальное окно для создания мероприятия -->
 <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
-    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true" data-bs-backdrop="static"></div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -102,15 +118,13 @@
             </div>
             <div class="modal-body form-compact">
                 <form id="createEventForm" method="post" action="{{ url_for('create_event') }}">
-                    <!-- Название мероприятия -->
                     <div class="mb-3">
-                        <label for="eventName" class="form-label">Название мероприятия</label>
+                        <label for="eventName" class="form-label fw-bold">Название мероприятия</label>
                         <input type="text" class="form-control" id="eventName" name="name" required>
                     </div>
 
-                    <!-- Тип мероприятия -->
-                    <div class="mb-3">
-                        <label for="eventType" class="form-label">Тип мероприятия</label>
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label for="eventType" class="form-label fw-bold">Тип мероприятия</label>
                         <select class="form-select" id="eventType" name="event_type_id" required>
                             <option value="" disabled selected>Выберите тип</option>
                             {% for event_type in event_types %}
@@ -119,9 +133,8 @@
                         </select>
                     </div>
 
-                    <!-- Помещение для проведения -->
-                    <div class="mb-3">
-                        <label for="eventLocation" class="form-label">Помещение для проведения</label>
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label for="eventLocation" class="form-label fw-bold">Помещение для проведения</label>
                         <select class="form-select" id="eventLocation" name="room_id" required>
                             <option value="" disabled selected>Выберите помещение</option>
                             {% for room in rooms %}
@@ -130,33 +143,25 @@
                         </select>
                     </div>
 
-                    <!-- Описание мероприятия -->
                     <div class="mb-3">
-                        <label for="eventDescription" class="form-label">Описание мероприятия</label>
-                        <div class="tooltip-wrapper">
-                            <textarea class="form-control" id="eventDescription" name="description" rows="3" required maxlength="240" 
-                                    onfocus="showTooltip(this)" onblur="hideTooltip()"></textarea>
-                            <div id="descriptionTooltip" class="custom-tooltip">
-                                Максимум 240 символов
-                            </div>
-                        </div>
+                        <label for="eventDescription" class="form-label fw-bold">Описание мероприятия</label>
+                        <textarea class="form-control" id="eventDescription" name="description" rows="3" required maxlength="240"></textarea>
                     </div>
-                    <!-- Даты -->
+                    
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label for="eventStartDate" class="form-label">Дата начала</label>
+                            <label for="eventStartDate" class="form-label fw-bold">Дата начала</label>
                             <input type="datetime-local" class="form-control" id="eventStartDate" name="start_time" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="eventEndDate" class="form-label">Дата окончания</label>
+                            <label for="eventEndDate" class="form-label fw-bold">Дата окончания</label>
                             <input type="datetime-local" class="form-control" id="eventEndDate" name="end_time" required>
                         </div>
                     </div>
 
-                    <!-- Количество и возраст -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label for="eventAgeLimit" class="form-label">Допустимый возраст</label>
+                            <label for="eventAgeLimit" class="form-label fw-bold">Допустимый возраст</label>
                             <select class="form-select" id="eventAgeLimit" name="min_age_category_id">
                                 <option value="">Без ограничений</option>
                                 {% for age_category in age_categories %}
@@ -165,21 +170,17 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="eventParticipants" class="form-label">Количество человек (до)</label>
+                            <label for="eventParticipants" class="form-label fw-bold">Количество человек (до)</label>
                             <input type="number" class="form-control" id="eventParticipants" name="max_participants" min="1" required>
                         </div>
                     </div>
 
-                    <!-- Сотрудники -->
                     <div class="mb-3">
-                        <label class="form-label">Сотрудники, участвующие в мероприятии</label>
-                        <div id="selectedEmployeesContainer" class="d-flex flex-wrap mb-2">
-                            <!-- Будут добавляться динамически -->
-                        </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" 
-        onclick="openEmployeeModal()">
-    <i class="bi bi-person-plus"></i> Добавить сотрудников
-</button>
+                        <label class="form-label fw-bold">Сотрудники, участвующие в мероприятии</label>
+                        <div id="selectedEmployeesContainer" class="d-flex flex-wrap mb-2"></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="openEmployeeModal()">
+                            <i class="bi bi-person-plus"></i> Добавить сотрудников
+                        </button>
                     </div>
                 </form>
             </div>
@@ -191,10 +192,7 @@
     </div>
 </div>
 
-<!-- Модальное окно выбора сотрудников -->
-<!-- Модальное окно выбора сотрудников (добавляем data-bs-backdrop="static") -->
-<!-- Изменяем модальное окно выбора сотрудников -->
-<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true" data-bs-backdrop="static">
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -247,7 +245,24 @@
     </div>
 </div>
 
-<!-- Модальное окно успешного создания -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteConfirmationText">Вы уверены, что хотите удалить это мероприятие?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -267,75 +282,168 @@
 
 {% block scripts %}
 <script>
-    function openEmployeeModal() {
-    // Закрываем все открытые модальные окна
-    document.querySelectorAll('.modal.show').forEach(modal => {
-        bootstrap.Modal.getInstance(modal).hide();
+let eventToDelete = null;
+
+function confirmDeleteEvent(eventId, eventName) {
+    eventToDelete = eventId;
+    document.getElementById('deleteConfirmationText').textContent = 
+        `Вы уверены, что хотите удалить мероприятие "${eventName}"?`;
+    
+    const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    deleteModal.show();
+}
+
+function deleteEvent(eventId) {
+    fetch(`/events/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Ошибка при удалении мероприятия');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ошибка при удалении мероприятия');
+    })
+    .finally(() => {
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+        deleteModal.hide();
+        eventToDelete = null;
+    });
+}
+
+function applyEventFilters() {
+    const nameFilter = document.getElementById('eventNameFilter')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('eventTypeFilter')?.value || '';
+    const statusFilter = document.getElementById('eventStatusFilter')?.value || '';
+    const roomFilter = document.getElementById('eventRoomFilter')?.value || '';
+    const dateFromFilter = document.getElementById('eventDateFromFilter')?.value || '';
+    const dateToFilter = document.getElementById('eventDateToFilter')?.value || '';
+    
+    const rows = document.querySelectorAll('#eventsTable tbody tr');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        if (row.cells.length < 9) return;
+        
+        const name = row.cells[0].textContent.toLowerCase();
+        const type = row.cells[1].textContent;
+        const startDate = new Date(row.cells[2].textContent);
+        const endDate = new Date(row.cells[3].textContent);
+        const participants = parseInt(row.cells[4].textContent) || 0;
+        const age = row.cells[5].textContent;
+        const room = row.cells[6].textContent;
+        const status = row.cells[7].textContent.trim();
+        
+        const matchesName = !nameFilter || name.includes(nameFilter);
+        const matchesType = !typeFilter || type === typeFilter;
+        const matchesStatus = !statusFilter || status === statusFilter;
+        const matchesRoom = !roomFilter || room === roomFilter;
+        
+        let matchesDate = true;
+        if (dateFromFilter) {
+            const fromDate = new Date(dateFromFilter);
+            matchesDate = matchesDate && startDate >= fromDate;
+        }
+        if (dateToFilter) {
+            const toDate = new Date(dateToFilter);
+            toDate.setHours(23, 59, 59);
+            matchesDate = matchesDate && endDate <= toDate;
+        }
+        
+        if (matchesName && matchesType && matchesStatus && matchesRoom && matchesDate) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
     });
     
-    // Открываем окно создания мероприятия
-    const createModal = new bootstrap.Modal(document.getElementById('createEventModal'));
-    createModal.show();
+    const noResultsRow = document.querySelector('#eventsTable tbody tr:last-child');
+    if (noResultsRow && noResultsRow.cells.length === 1) {
+        noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
+    }
     
-    // Открываем окно выбора сотрудников
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+    if (filterModal) filterModal.hide();
+}
+
+function resetEventFilters() {
+    document.getElementById('eventNameFilter').value = '';
+    document.getElementById('eventTypeFilter').value = '';
+    document.getElementById('eventStatusFilter').value = '';
+    document.getElementById('eventRoomFilter').value = '';
+    document.getElementById('eventDateFromFilter').value = '';
+    document.getElementById('eventDateToFilter').value = '';
+    
+    const rows = document.querySelectorAll('#eventsTable tbody tr');
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+    
+    const noResultsRow = document.querySelector('#eventsTable tbody tr:last-child');
+    if (noResultsRow && noResultsRow.cells.length === 1) {
+        noResultsRow.style.display = rows.length <= 1 ? '' : 'none';
+    }
+    
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+    if (filterModal) filterModal.hide();
+}
+
+function sortTable(columnIndex, sortKey) {
+    const table = document.getElementById('eventsTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not([style*="display: none"])'));
+    
+    const header = table.querySelector(`th[data-sort="${sortKey}"]`);
+    const currentOrder = header.getAttribute('data-order') || 'asc';
+    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    
+    table.querySelectorAll('th').forEach(th => th.removeAttribute('data-order'));
+    header.setAttribute('data-order', newOrder);
+    
+    rows.sort((a, b) => {
+        let aValue = a.cells[columnIndex].textContent.trim();
+        let bValue = b.cells[columnIndex].textContent.trim();
+        
+        if (sortKey === 'start_time' || sortKey === 'end_time') {
+            const convertDate = (dateStr) => {
+                const [datePart, timePart] = dateStr.split(' ');
+                const [day, month, year] = datePart.split('.');
+                return `${year}-${month}-${day} ${timePart}`;
+            };
+            
+            aValue = new Date(convertDate(aValue));
+            bValue = new Date(convertDate(bValue));
+        } else if (sortKey === 'max_participants') {
+            aValue = parseInt(aValue) || 0;
+            bValue = parseInt(bValue) || 0;
+        }
+        
+        if (aValue < bValue) return newOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return newOrder === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function openEmployeeModal() {
     const employeeModal = new bootstrap.Modal(document.getElementById('employeeModal'));
     employeeModal.show();
 }
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, нужно ли показать модальное окно
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('show_modal') && urlParams.get('show_modal') === 'true') {
-        const createModal = new bootstrap.Modal(document.getElementById('createEventModal'));
-        createModal.show();
-        
-        // Убираем параметр из URL без перезагрузки страницы
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-    }
-    
-});
-    function showTooltip() {
-    const tooltip = document.getElementById('descriptionTooltip');
-    if (tooltip) {
-        tooltip.style.display = 'block';
-    }
-}
 
-function hideTooltip() {
-    const tooltip = document.getElementById('descriptionTooltip');
-    if (tooltip) {
-        tooltip.style.display = 'none';
-    }
-}
-    // Применяем сохраненные фильтры
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        if (urlParams.has('date')) {
-            document.getElementById('dateFilter').value = urlParams.get('date');
-        }
-        
-        if (urlParams.has('event_type')) {
-            document.getElementById('typeFilter').value = urlParams.get('event_type');
-        }
-        
-        if (urlParams.has('status')) {
-            document.getElementById('statusFilter').value = urlParams.get('status');
-        }
-    });
-document.getElementById('createEventForm')?.addEventListener('submit', function(e) {
-    const startDate = new Date(document.getElementById('eventStartDate').value);
-    const endDate = new Date(document.getElementById('eventEndDate').value);
-    
-    if (endDate <= startDate) {
-        e.preventDefault();
-        alert('Дата окончания должна быть позже даты начала');
-        return false;
-    }
-    
-    return true;
-});
-    function updateSelectedEmployees() {
+function updateSelectedEmployees() {
     const container = document.getElementById('selectedEmployeesContainer');
     const checkboxes = document.querySelectorAll('#employeeModal .employee-checkbox:checked');
     
@@ -344,7 +452,6 @@ document.getElementById('createEventForm')?.addEventListener('submit', function(
         const value = checkbox.value;
         const isExternal = checkbox.closest('#external') !== null;
 
-        // Проверяем, не добавлен ли уже этот сотрудник
         if (!document.querySelector(`input[name="employee_ids"][value="${value}"]`)) {
             const chip = document.createElement('div');
             chip.className = 'employee-chip';
@@ -360,58 +467,88 @@ document.getElementById('createEventForm')?.addEventListener('submit', function(
             `;
             container.appendChild(chip);
         }
-
         checkbox.checked = false;
     });
 
-    // Закрываем только модальное окно выбора сотрудников
-    const employeeModalEl = document.getElementById('employeeModal');
-    const employeeModal = bootstrap.Modal.getInstance(employeeModalEl);
+    const employeeModal = bootstrap.Modal.getInstance(document.getElementById('employeeModal'));
     employeeModal.hide();
-    
-    // Возвращаем фокус на модальное окно создания мероприятия
-    const createEventModal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
-    createEventModal._element.focus();
-    
-    // Принудительно показываем backdrop родительского окна
-    document.body.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
-    document.body.style.paddingRight = '0px';
-    document.querySelector('.modal-backdrop').style.display = 'block';
 }
 
-
-    // Обработка успешного создания мероприятия
-    document.getElementById('createEventForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        try {
-            const formData = new FormData(this);
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData
-            });
-            
-            if (response.ok) {
-                // Закрываем модальное окно создания
-                const createModal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
-                createModal.hide();
-                
-                // Показываем модальное окно успеха
-                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                successModal.show();
-                
-                // Обновляем страницу через 2 секунды
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-            } else {
-                alert('Ошибка при создании мероприятия');
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (eventToDelete) {
+                deleteEvent(eventToDelete);
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Ошибка при создании мероприятия');
-        }
+        });
+    }
+    
+    document.querySelectorAll('#eventsTable th[data-sort]').forEach((th, index) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+            const sortKey = th.getAttribute('data-sort');
+            sortTable(index, sortKey);
+        });
     });
+    
+    document.getElementById('createEventForm')?.addEventListener('submit', function(e) {
+        const startDate = new Date(document.getElementById('eventStartDate').value);
+        const endDate = new Date(document.getElementById('eventEndDate').value);
+        
+        if (endDate <= startDate) {
+            e.preventDefault();
+            alert('Дата окончания должна быть позже даты начала');
+            return false;
+        }
+        return true;
+    });
+});
 </script>
+
+<style>
+.employee-chip {
+    background-color: #e9ecef;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    margin: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.employee-badge {
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.badge-internal {
+    background-color: #198754;
+    color: white;
+}
+
+.badge-external {
+    background-color: #ffc107;
+    color: black;
+}
+
+th[data-sort]:hover {
+    background-color: #f8f9fa;
+}
+
+th[data-order]::after {
+    content: ' ↕';
+    font-size: 0.8em;
+}
+
+th[data-order="asc"]::after {
+    content: ' ↑';
+}
+
+th[data-order="desc"]::after {
+    content: ' ↓';
+}
+</style>
 {% endblock %}

@@ -108,11 +108,11 @@ loginModalLabel" aria-hidden="true">
                 {% endif %}
                 <form action="/login" method="post">
                     <div class="mb-3">
-                        <label for="loginEmail" class="form-label">Логин (email)</label>
+                        <label for="loginEmail" class="form-label fw-bold">Логин (email)</label>
                         <input type="email" class="form-control" id="loginEmail" name="username" required>
                     </div>
                     <div class="mb-3">
-                        <label for="loginPassword" class="form-label">Пароль</label>
+                        <label for="loginPassword" class="form-label fw-bold">Пароль</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="loginPassword" name="password" required>
                             <button class="btn btn-outline-secondary" type="button" id="togglePassword">
@@ -134,7 +134,6 @@ loginModalLabel" aria-hidden="true">
     </div>
 </div>
 
-<!-- Модальное окно "Забыли пароль" -->
 <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -148,7 +147,7 @@ loginModalLabel" aria-hidden="true">
                 {% endif %}
                 <form action="/forgot-password" method="post">
                     <div class="mb-3">
-                        <label class="form-label">Email вашей учетной записи</label>
+                        <label class="form-label fw-bold">Email вашей учетной записи</label>
                         <input type="email" class="form-control" name="email" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Отправить инструкции</button>

@@ -108,14 +108,14 @@
 
 <!-- Название мероприятия -->
 <div class="mb-3">
-    <label for="editEventName" class="form-label">Название мероприятия</label>
+    <label for="editEventName" class="form-label fw-bold">Название мероприятия</label>
     <input type="text" class="form-control" id="editEventName" name="name" 
            value="{{ event.name }}" required>
 </div>
 
 <!-- Описание мероприятия -->
 <div class="mb-3">
-    <label for="editEventDescription" class="form-label">Описание</label>
+    <label for="editEventDescription" class="form-label fw-bold">Описание</label>
     <textarea class="form-control" id="editEventDescription" name="description" 
               rows="3" required>{{ event.description }}</textarea>
 </div>
@@ -123,7 +123,7 @@
 <div class="row g-3 mb-3">
     <!-- Тип мероприятия -->
     <div class="col-md-6">
-        <label for="editEventType" class="form-label">Тип мероприятия</label>
+        <label for="editEventType" class="form-label fw-bold">Тип мероприятия</label>
         <select class="form-select" id="editEventType" name="event_type_id" required>
             {% for type in event_types %}
             <option value="{{ type.id }}" 
@@ -136,7 +136,7 @@
 
     <!-- Статус мероприятия -->
     <div class="col-md-6">
-        <label for="editEventStatus" class="form-label">Статус</label>
+        <label for="editEventStatus" class="form-label fw-bold">Статус</label>
         <select class="form-select" id="editEventStatus" name="status_id" required>
             {% for status in event_statuses %}
             <option value="{{ status.id }}"
@@ -150,7 +150,7 @@
 
 <!-- Помещение -->
 <div class="mb-3">
-    <label for="editEventRoom" class="form-label">Помещение</label>
+    <label for="editEventRoom" class="form-label fw-bold">Помещение</label>
     <select class="form-select" id="editEventRoom" name="room_id" required>
         {% for room in rooms %}
         <option value="{{ room.id }}"
@@ -163,7 +163,7 @@
 
 <!-- Возрастное ограничение -->
 <div class="mb-3">
-    <label for="editEventAge" class="form-label">Допустимый возраст</label>
+    <label for="editEventAge" class="form-label fw-bold">Допустимый возраст</label>
     <select class="form-select" id="editEventAge" name="min_age_category_id">
         <option value="">Без ограничений</option>
         {% for age in age_categories %}
@@ -178,22 +178,20 @@
 <div class="row g-3 mb-3">
     <!-- Дата и время начала -->
     <div class="col-md-6">
-        <label for="editEventStart" class="form-label">Дата и время начала</label>
+        <label for="editEventStart" class="form-label fw-bold">Дата и время начала</label>
         <input type="datetime-local" class="form-control" id="editEventStart" name="start_time" 
                value="{{ event.start_time.strftime('%Y-%m-%dT%H:%M') }}" required>
     </div>
 
-    <!-- Дата и время окончания -->
     <div class="col-md-6">
-        <label for="editEventEnd" class="form-label">Дата и время окончания</label>
+        <label for="editEventEnd" class="form-label fw-bold">Дата и время окончания</label>
         <input type="datetime-local" class="form-control" id="editEventEnd" name="end_time" 
                value="{{ event.end_time.strftime('%Y-%m-%dT%H:%M') }}" required>
     </div>
 </div>
 
-<!-- Максимальное количество участников -->
 <div class="mb-3">
-    <label for="editEventParticipants" class="form-label">Максимальное количество участников</label>
+    <label for="editEventParticipants" class="form-label fw-bold">Максимальное количество участников</label>
     <input type="number" class="form-control" id="editEventParticipants" name="max_participants" 
            value="{{ event.max_participants }}" min="1" required>
 </div>
@@ -207,7 +205,6 @@
     </div>
 </div>
 
-<!-- Модальное окно добавления участников -->
 <div class="modal fade" id="addParticipantsModal" tabindex="-1" aria-labelledby="addParticipantsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

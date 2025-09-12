@@ -16,12 +16,17 @@ import json
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
-UPLOAD_DIR = Path("/opt/event_app/static/images")
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+UPLOAD_DIR = BASE_DIR / "static" / "images"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="/opt/event_app/static"), name="static")
-templates = Jinja2Templates(directory="/opt/event_app/templates")
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
 ADMIN_USERNAME = "admin@eventsystem.com"
@@ -447,13 +452,9 @@ async def root(
 ):
     """Главная страница для авторизованных пользователей"""
     try:
-        # Временно убираем проверку ролей
-        # user_data: dict = Depends(role_required(['Пользователь', 'Сотрудник', 'Организатор', 'Администратор']))
         
-        # Получаем пользователя без проверки ролей
         current_user = await get_current_user(request)
         
-        # Получаем роли пользователя
         conn = await get_connection()
         roles = await conn.fetch(
             "SELECT r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = $1",
@@ -544,7 +545,7 @@ async def activity(
             {"request": request, "error": "Ошибка загрузки данных"},
             status_code=500
         )
-
+        
 @app.post("/api/activity/report")
 async def generate_activity_report(
     request: Request,
@@ -561,13 +562,15 @@ async def generate_activity_report(
         current_user['roles'] = user_data["roles"]
         conn = await get_connection()
         
-        
         try:
-            start_datetime = datetime.strptime(start_date, "%Y-%m-%d").date()
-            end_datetime = datetime.strptime(end_date, "%Y-%m-%d").date()
+            if 'T' in start_date:
+                start_datetime = datetime.fromisoformat(start_date.replace('T', ' '))
+                end_datetime = datetime.fromisoformat(end_date.replace('T', ' '))
+            else:
+                start_datetime = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+                end_datetime = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
-            return {"success": False, "error": f"Неверный формат даты: {str(e)}"}
-        
+            return {"success": False, "error": f"Неверный формат даты: {str(e)}. Попробуйте иначе."}
         
         query = """
             SELECT 
@@ -581,7 +584,7 @@ async def generate_activity_report(
             LEFT JOIN event_types et ON et.id = e.event_type_id
             LEFT JOIN age_categories ac ON ac.id = e.min_age_category_id
             LEFT JOIN event_statuses es ON es.id = e.status_id
-            WHERE DATE(e.start_time) BETWEEN $1 AND $2
+            WHERE e.start_time >= $1 AND e.end_time <= $2
         """
         params = [start_datetime, end_datetime]
         
@@ -591,7 +594,6 @@ async def generate_activity_report(
             params.append(int(event_id))  
         
         if filter_type and filter_value and filter_value != "all":
-            
             param_position = len(params) + 1
             
             if filter_type == "room":
@@ -621,14 +623,13 @@ async def generate_activity_report(
         
         events = await conn.fetch(query, *params)
         
-        
         report_data = []
         for event in events:
             report_data.append({
                 "id": event["id"],
                 "name": event["name"],
-                "start_date": event["start_time"].strftime("%d.%m.%Y"),
-                "end_date": event["end_time"].strftime("%d.%m.%Y"),
+                "start_date": event["start_time"].isoformat(), 
+                "end_date": event["end_time"].isoformat(),    
                 "status": event["status_name"],
                 "age_category": event["age_category_name"],
                 "participants": event["max_participants"],
@@ -1155,7 +1156,174 @@ async def events(
     finally:
         if 'conn' in locals():
             await conn.close()
+            
+@app.get("/rooms/{room_id}/edit")
+async def edit_room_form(
+    request: Request, 
+    room_id: int,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
+    try:
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
+        conn = await get_connection()
+        
+        room = await conn.fetchrow(
+            """SELECT r.*, rt.name as room_type_name 
+               FROM rooms r
+               LEFT JOIN room_types rt ON r.room_type_id = rt.id
+               WHERE r.id = $1""",
+            room_id
+        )
+        
+        if not room:
+            raise HTTPException(status_code=404, detail="Помещение не найдено")
+        
+        room_types = await conn.fetch("SELECT * FROM room_types ORDER BY name")
+        
+        return templates.TemplateResponse(
+            "edit_room.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "room": room,
+                "room_types": room_types
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting room edit form: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка сервера")
+    finally:
+        if 'conn' in locals():
+            await conn.close()
+            
+@app.get("/rooms/{room_id}/edit")
+async def edit_room_form(
+    request: Request, 
+    room_id: int,
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
+    try:
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
+        conn = await get_connection()
+        
+        # Получаем данные помещения
+        room = await conn.fetchrow(
+            """SELECT r.*, rt.name as room_type_name 
+               FROM rooms r
+               LEFT JOIN room_types rt ON r.room_type_id = rt.id
+               WHERE r.id = $1""",
+            room_id
+        )
+        
+        if not room:
+            raise HTTPException(status_code=404, detail="Помещение не найдено")
+        
+        # Получаем список типов помещений для выпадающего списка
+        room_types = await conn.fetch("SELECT * FROM room_types ORDER BY name")
+        
+        return templates.TemplateResponse(
+            "edit_room.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "room": room,
+                "room_types": room_types
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting room edit form: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка сервера")
+    finally:
+        if 'conn' in locals():
+            await conn.close()
 
+@app.post("/rooms/{room_id}/update")
+async def update_room(
+    request: Request,
+    room_id: int,
+    name: str = Form(...),
+    room_type_id: int = Form(...),
+    capacity: int = Form(...),
+    address: str = Form(...),
+    description: Optional[str] = Form(None),
+    image: Optional[UploadFile] = File(None),
+    is_external: bool = Form(False),
+    external_url: Optional[str] = Form(None),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
+    """Обновление данных помещения"""
+    image_filename = None
+    
+    try:
+        current_user = user_data["user"]
+        current_user['roles'] = user_data["roles"]
+        conn = await get_connection()
+        
+        room = await conn.fetchrow("SELECT * FROM rooms WHERE id = $1", room_id)
+        if not room:
+            raise HTTPException(status_code=404, detail="Помещение не найдено")
+        
+        room_type = await conn.fetchrow("SELECT id FROM room_types WHERE id = $1", room_type_id)
+        if not room_type:
+            raise HTTPException(status_code=400, detail="Неверный тип помещения")
+        
+        if image and image.filename:
+            if room['image_filename']:
+                old_image_path = UPLOAD_DIR / room['image_filename']
+                if old_image_path.exists():
+                    old_image_path.unlink()
+            
+            file_ext = os.path.splitext(image.filename)[1]
+            image_filename = f"room_{secrets.token_hex(8)}{file_ext}"
+            file_path = UPLOAD_DIR / image_filename
+            with file_path.open("wb") as buffer:
+                buffer.write(await image.read())
+        
+        if image_filename:
+            await conn.execute(
+                """UPDATE rooms SET 
+                    name = $1, room_type_id = $2, capacity = $3, address = $4, 
+                    description = $5, is_external = $6, external_url = $7,
+                    image_filename = $8
+                   WHERE id = $9""",
+                name, room_type_id, capacity, address, description, 
+                is_external, external_url, image_filename, room_id
+            )
+        else:
+            await conn.execute(
+                """UPDATE rooms SET 
+                    name = $1, room_type_id = $2, capacity = $3, address = $4, 
+                    description = $5, is_external = $6, external_url = $7
+                   WHERE id = $8""",
+                name, room_type_id, capacity, address, description, 
+                is_external, external_url, room_id
+            )
+        
+        return RedirectResponse(url=f"/rooms/{room_id}", status_code=303)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error updating room: {e}")
+        if image_filename and (UPLOAD_DIR / image_filename).exists():
+            (UPLOAD_DIR / image_filename).unlink()
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "error": "Ошибка при обновлении помещения"},
+            status_code=500
+        )
+    finally:
+        if 'conn' in locals():
+            await conn.close()
+            
 @app.get("/events/create", name="create_event")
 async def create_event_form(
     request: Request,

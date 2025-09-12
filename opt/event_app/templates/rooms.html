@@ -4,7 +4,6 @@
 <div class="container mt-4">
     <h1 class="mb-4">Ресурсы организации</h1>
 
-    <!-- Вкладки -->
     <ul class="nav resources-tabs mb-4" id="resourcesTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="rooms-tab" data-bs-toggle="tab" data-bs-target="#rooms" type="button">
@@ -18,143 +17,114 @@
         </li>
     </ul>
 
-    <!-- Контент вкладок -->
-    <div class="tab-content" id="resourcesTabsContent">
-        <!-- Вкладка "Помещения" -->
-        <div class="tab-pane fade show active" id="rooms" role="tabpanel" aria-labelledby="rooms-tab">
-            <!-- Кнопки действий -->
-            <div class="d-flex justify-content-end mb-4 action-buttons gap-2">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-                    <i class="bi bi-funnel"></i> 
-                </button>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRoomModal">
-                    <i class="bi bi-plus-lg"></i> 
-                </button>
-            </div>
+<div class="tab-content" id="resourcesTabsContent">
+    <div class="tab-pane fade show active" id="rooms" role="tabpanel" aria-labelledby="rooms-tab">
+        <div class="d-flex justify-content-end mb-4 action-buttons gap-2">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <i class="bi bi-funnel"></i> 
+            </button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+                <i class="bi bi-plus-lg"></i> 
+            </button>
+        </div>
 
-            <div class="row" id="roomsContainer">
-                {% for room in rooms %}
-                <div class="col-md-4 mb-4 room-card" 
-                    data-name="{{ room.name|lower }}" 
-                    data-type="{{ room.room_type_id }}" 
-                    data-capacity="{{ room.capacity }}"
-                    data-address="{{ room.address|lower }}"
-                    data-external="{{ room.is_external }}">
-                    <div class="card h-100">
-                        {% if room.is_external %}
-                        <span class="badge bg-warning position-absolute top-0 end-0 m-2">Внешний</span>
-                        {% endif %}
-                        <div class="room-card-img">
-                            {% if room.image_filename %}
-                            <div class="image-container">
-                                <img src="/static/images/{{ room.image_filename }}" alt="{{ room.name }}" class="img-fluid">
-                            </div>
-                            {% else %}
-                            <!-- Заглушка, если изображение не указано -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-building" viewBox="0 0 16 16">
-                                <path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-                                <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3z"/>
-                            </svg>
-                            {% endif %}
-                        </div>
-                        <span class="capacity-badge">до {{ room.capacity }} чел.</span>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ room.name }}</h5>
-                            <div class="room-feature">
-                                <i class="bi bi-building"></i>
-                                <span>Тип: {{ room.room_type_name }}</span>
-                            </div>
-                            <div class="room-feature">
-                                <i class="bi bi-geo-alt"></i>
-                                <span>Адрес: {{ room.address }}</span>
-                            </div>
-                            {% if room.description %}
-                            <div class="room-feature">
-                                <i class="bi bi-card-text"></i>
-                                <span>{{ room.description }}</span>
-                            </div>
-                            {% endif %}
-                            {% if room.external_url %}
-                            <div class="room-feature">
-                                <i class="bi bi-link-45deg"></i>
-                                <a href="{{ room.external_url }}" target="_blank">Источник</a>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer bg-transparent d-flex justify-content-between">
-                            <a href="/rooms/{{ room.id }}" class="btn btn-outline-primary btn-sm">Подробнее</a>
-                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDeleteRoom({{ room.id }}, '{{ room.name }}')">
+        <div class="table-responsive">
+            <table class="table table-hover" id="roomsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th data-sort="name">Название</th>
+                        <th data-sort="room_type_name">Тип</th>
+                        <th class="text-end" data-sort="capacity">Вместимость (до)</th>
+                        <th data-sort="address">Адрес</th>
+                        <th data-sort="is_external">Тип ресурса</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for room in rooms %}
+                    <tr>
+                        <td>{{ room.name }}</td>
+                        <td>{{ room.room_type_name }}</td>
+                        <td class="text-end font-monospace">{{ room.capacity }}</td>
+                        <td>{{ room.address }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-warning' if room.is_external else 'bg-success' }}">
+                                {{ 'Внешний' if room.is_external else 'Внутренний' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/rooms/{{ room.id }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteRoom({{ room.id }}, '{{ room.name }}')">
                                 <i class="bi bi-trash"></i>
                             </button>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="col-12">
-                    <div class="alert alert-info">Помещения не найдены</div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Вкладка "Сотрудники" -->
-        <div class="tab-pane fade" id="employees" role="tabpanel" aria-labelledby="employees-tab">
-            <!-- Кнопки действий -->
-            <div class="d-flex justify-content-end mb-4 action-buttons gap-2">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeFilterModal">
-                    <i class="bi bi-funnel"></i>
-                </button>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ФИО</th>
-                            <th>Должность</th>
-                            <th>Тип</th>
-                            <th>Контакты</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for employee in employees %}
-                        <tr>
-                            <td>{{ employee.full_name }}</td>
-                            <td>{{ employee.position }}</td>
-                            <td>
-                                <span class="badge {{ 'bg-warning' if employee.is_external else 'bg-success' }}">
-                                    {{ 'Внешний' if employee.is_external else 'Внутренний' }}
-                                </span>
-                            </td>
-                            <td>{{ employee.contact_info if employee.contact_info else '—' }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
-                                    data-bs-target="#editEmployeeModal{{ employee.id }}">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" 
-                                    onclick="confirmDeleteEmployee({{ employee.id }}, '{{ employee.full_name }}')">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center">Сотрудники не найдены</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Помещения не найдены</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<!-- Модальное окно фильтров помещений -->
+    <div class="tab-pane fade" id="employees" role="tabpanel" aria-labelledby="employees-tab">
+        <div class="d-flex justify-content-end mb-4 action-buttons gap-2">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeFilterModal">
+                <i class="bi bi-funnel"></i>
+            </button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="employeesTable">
+                <thead class="table-light">
+                    <tr>
+                        <th data-sort="full_name">ФИО</th>
+                        <th data-sort="position">Должность</th>
+                        <th data-sort="is_external">Тип</th>
+                        <th data-sort="contact_info">Контакты</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.full_name }}</td>
+                        <td>{{ employee.position }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-warning' if employee.is_external else 'bg-success' }}">
+                                {{ 'Внешний' if employee.is_external else 'Внутренний' }}
+                            </span>
+                        </td>
+                        <td>{{ employee.contact_info if employee.contact_info else '—' }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                data-bs-target="#editEmployeeModal{{ employee.id }}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                onclick="confirmDeleteEmployee({{ employee.id }}, '{{ employee.full_name }}')">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Сотрудники не найдены</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 
+
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -165,11 +135,11 @@
             <div class="modal-body">
                 <form id="roomFilterForm">
                     <div class="mb-3">
-                        <label for="roomNameFilter" class="form-label">Название</label>
+                        <label for="roomNameFilter" class="form-label fw-bold fw-bold">Название</label>
                         <input type="text" class="form-control" id="roomNameFilter" placeholder="Поиск по названию">
                     </div>
-                    <div class="mb-3">
-                        <label for="roomTypeFilter" class="form-label">Тип помещения</label>
+                    <div class="mb-3" style="max-width: 350px;">
+                        <label for="roomTypeFilter" class="form-label fw-bold fw-bold">Тип помещения</label>
                         <select class="form-select" id="roomTypeFilter">
                             <option value="">Все типы</option>
                             {% for room_type in room_types %}
@@ -178,16 +148,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="roomCapacityFilter" class="form-label">Вместимость (от)</label>
-                        <input type="number" class="form-control" id="roomCapacityFilter" min="1" placeholder="Минимальная вместимость">
+                        <label for="roomCapacityFilter" class="form-label fw-bold fw-bold">Вместимость (до)</label>
+                        <input type="number" class="form-control" id="roomCapacityFilter" min="1" placeholder="Минимальная вместимость" style="max-width: 150px;">
                     </div>
                     <div class="mb-3">
-                        <label for="roomAddressFilter" class="form-label">Адрес</label>
+                        <label for="roomAddressFilter" class="form-label fw-bold fw-bold">Адрес</label>
                         <input type="text" class="form-control" id="roomAddressFilter" placeholder="Поиск по адресу">
                     </div>
                     <div class="mb-3">
-                        <label for="roomExternalFilter" class="form-label">Тип ресурса</label>
-                        <select class="form-select" id="roomExternalFilter">
+                        <label for="roomExternalFilter" class="form-label fw-bold fw-bold">Тип ресурса</label>
+                        <select class="form-select" id="roomExternalFilter" style="max-width: 150px;">
                             <option value="">Все</option>
                             <option value="true">Внешние</option>
                             <option value="false">Внутренние</option>
@@ -203,7 +173,6 @@
     </div>
 </div>
 
-<!-- Модальное окно для добавления помещения -->
 <div class="modal fade" id="addRoomModal" tabindex="-1" aria-labelledby="addRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -222,7 +191,7 @@
                         </div>
                         <div class="col-md-6">
                             <div id="externalRoomFields" style="display: none;">
-                                <label for="externalRoomUrl" class="form-label">Ссылка на внешний ресурс</label>
+                                <label for="externalRoomUrl" class="form-label fw-bold fw-bold">Ссылка на внешний ресурс</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="externalRoomUrl" name="external_url" placeholder="https://flamp.ru/...">
                                     <button class="btn btn-outline-secondary" type="button" id="parseRoomBtn">Заполнить</button>
@@ -235,12 +204,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="roomName" class="form-label">Название помещения*</label>
+                                <label for="roomName" class="form-label fw-bold fw-bold">Название помещения*</label>
                                 <input type="text" class="form-control" id="roomName" name="name" required>
                             </div>
                             <div class="mb-3">
-                                <label for="roomType" class="form-label">Тип помещения*</label>
-                                <select class="form-select" id="roomType" name="room_type_id" required>
+                                <label for="roomType" class="form-label fw-bold">Тип помещения*</label>
+                                <select class="form-select" id="roomType" name="room_type_id" style="max-width: 300px;" required>
                                     <option value="" selected disabled>Выберите тип</option>
                                     {% for room_type in room_types %}
                                         <option value="{{ room_type.id }}">{{ room_type.name }}</option>
@@ -248,21 +217,21 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="roomCapacity" class="form-label">Вместимость (человек)*</label>
-                                <input type="number" class="form-control" id="roomCapacity" name="capacity" min="1" required>
+                                <label for="roomCapacity" class="form-label fw-bold fw-bold">Вместимость (человек)*</label>
+                                <input type="number" class="form-control" id="roomCapacity" name="capacity" min="1" style="max-width: 100px;" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="roomAddress" class="form-label">Адрес*</label>
+                                <label for="roomAddress" class="form-label fw-bold fw-bold">Адрес*</label>
                                 <input type="text" class="form-control" id="roomAddress" name="address" required>
                             </div>
                             <div class="mb-3">
-                                <label for="roomDescription" class="form-label">Описание</label>
+                                <label for="roomDescription" class="form-label fw-bold fw-bold">Описание</label>
                                 <textarea class="form-control" id="roomDescription" name="description" rows="3"></textarea>
                             </div>
                             <div class="mb-3">
-                                <label for="roomImage" class="form-label">Изображение помещения</label>
+                                <label for="roomImage" class="form-label fw-bold fw-bold">Изображение помещения</label>
                                 <input type="file" class="form-control" id="roomImage" name="image" accept="image/*">
                                 <div class="form-text">Рекомендуемый размер: 800x600px, формат JPG или PNG</div>
                                 <div id="imagePreviewContainer" class="mt-2"></div>
@@ -278,7 +247,6 @@
         </div>
     </div>
 </div>
-<!-- Модальное окно для редактирования сотрудника -->
 {% for employee in employees %}
 <div class="modal fade" id="editEmployeeModal{{ employee.id }}" tabindex="-1" aria-labelledby="editEmployeeModalLabel{{ employee.id }}" aria-hidden="true">
     <div class="modal-dialog">
@@ -290,17 +258,17 @@
             <form method="post" action="/employees/{{ employee.id }}/update" id="editEmployeeForm{{ employee.id }}">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="editFullName{{ employee.id }}" class="form-label">ФИО*</label>
+                        <label for="editFullName{{ employee.id }}" class="form-label fw-bold">ФИО*</label>
                         <input type="text" class="form-control" id="editFullName{{ employee.id }}" 
                                name="full_name" value="{{ employee.full_name }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editPosition{{ employee.id }}" class="form-label">Должность*</label>
+                        <label for="editPosition{{ employee.id }}" class="form-label fw-bold">Должность*</label>
                         <input type="text" class="form-control" id="editPosition{{ employee.id }}" 
                                name="position" value="{{ employee.position }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="editContactInfo{{ employee.id }}" class="form-label">Контактная информация</label>
+                        <label for="editContactInfo{{ employee.id }}" class="form-label fw-bold">Контактная информация</label>
                         <input type="text" class="form-control" id="editContactInfo{{ employee.id }}" 
                                name="contact_info" value="{{ employee.contact_info or '' }}">
                     </div>
@@ -311,7 +279,7 @@
                     </div>
                     <div class="mb-3" id="editExternalUrlContainer{{ employee.id }}" 
                          style="{{ 'display: block;' if employee.is_external else 'display: none;' }}">
-                        <label for="editExternalUrl{{ employee.id }}" class="form-label">Ссылка на внешний ресурс</label>
+                        <label for="editExternalUrl{{ employee.id }}" class="form-label fw-bold">Ссылка на внешний ресурс</label>
                         <input type="text" class="form-control" id="editExternalUrl{{ employee.id }}" 
                                name="external_url" value="{{ employee.external_url or '' }}">
                     </div>
@@ -325,7 +293,6 @@
     </div>
 </div>
 {% endfor %}
-<!-- Модальное окно фильтров сотрудников -->
 <div class="modal fade" id="employeeFilterModal" tabindex="-1" aria-labelledby="employeeFilterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -336,16 +303,16 @@
             <div class="modal-body">
                 <form id="employeeFilterForm">
                     <div class="mb-3">
-                        <label for="employeeNameFilter" class="form-label">ФИО</label>
+                        <label for="employeeNameFilter" class="form-label fw-bold">ФИО</label>
                         <input type="text" class="form-control" id="employeeNameFilter" placeholder="Поиск по ФИО">
                     </div>
                     <div class="mb-3">
-                        <label for="employeePositionFilter" class="form-label">Должность</label>
+                        <label for="employeePositionFilter" class="form-label fw-bold">Должность</label>
                         <input type="text" class="form-control" id="employeePositionFilter" placeholder="Поиск по должности">
                     </div>
                     <div class="mb-3">
-                        <label for="employeeTypeFilter" class="form-label">Тип сотрудника</label>
-                        <select class="form-select" id="employeeTypeFilter">
+                        <label for="employeeTypeFilter" class="form-label fw-bold">Тип сотрудника</label>
+                        <select class="form-select" id="employeeTypeFilter" style="max-width: 150px;">
                             <option value="">Все</option>
                             <option value="false">Внутренние</option>
                             <option value="true">Внешние</option>
@@ -361,7 +328,6 @@
     </div>
 </div>
 
-<!-- Модальное окно для добавления сотрудника -->
 <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -380,7 +346,7 @@
                         </div>
                         <div class="col-md-6">
                             <div id="externalEmployeeFields" style="display: none;">
-                                <label for="externalEmployeeUrl" class="form-label">Ссылка на резюме (hh.ru)</label>
+                                <label for="externalEmployeeUrl" class="form-label fw-bold">Ссылка на резюме (hh.ru)</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="externalEmployeeUrl" name="external_url" placeholder="https://hh.ru/resume/...">
                                     <button class="btn btn-outline-secondary" type="button" id="parseEmployeeBtn">Заполнить</button>
@@ -393,17 +359,17 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="employeeFullName" class="form-label">ФИО*</label>
+                                <label for="employeeFullName" class="form-label fw-bold">ФИО*</label>
                                 <input type="text" class="form-control" id="employeeFullName" name="full_name" required>
                             </div>
                             <div class="mb-3">
-                                <label for="employeePosition" class="form-label">Должность*</label>
+                                <label for="employeePosition" class="form-label fw-bold">Должность*</label>
                                 <input type="text" class="form-control" id="employeePosition" name="position" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="employeeContactInfo" class="form-label">Контактная информация</label>
+                                <label for="employeeContactInfo" class="form-label fw-bold">Контактная информация</label>
                                 <input type="text" class="form-control" id="employeeContactInfo" name="contact_info">
                             </div>
                         </div>
@@ -418,7 +384,6 @@
     </div>
 </div>
 
-<!-- Модальное окно подтверждения удаления -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -439,81 +404,44 @@
 
 {% block scripts %}
 <script>
-    // Global variables - declare only once
-    let roomToDelete = null;
-    let employeeToDelete = null;
-    
-    // Function to confirm room deletion
-    function confirmDeleteRoom(roomId, roomName) {
-        roomToDelete = roomId;
-        document.getElementById('deleteConfirmationText').textContent = 
-            `Вы уверены, что хотите удалить помещение "${roomName}"?`;
-        
-        const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-        deleteModal.show();
-    }
-    
-    // Function to delete room
-    function deleteRoom(roomId) {
-        fetch(`/rooms/${roomId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                alert('Ошибка при удалении помещения');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ошибка при удалении помещения');
-        })
-        .finally(() => {
-            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
-            deleteModal.hide();
-            roomToDelete = null;
-        });
-    }
-    
-    // Confirm delete button handler
-    document.addEventListener('DOMContentLoaded', function() {
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        if (confirmDeleteBtn) {
-            confirmDeleteBtn.addEventListener('click', function() {
-                if (roomToDelete) {
-                    deleteRoom(roomToDelete);
-                }
-            });
-        }
+let roomToDelete = null;
+let employeeToDelete = null;
 
-        const addEmployeeForm = document.getElementById('addEmployeeForm');
-            if (addEmployeeForm) {
-                addEmployeeForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    try {
-                        const response = await fetch('/employees/add', {
-                            method: 'POST',
-                            body: new FormData(this)
-                        });
-                        
-                        if (response.ok) {
-                            location.reload();
-                        } else {
-                            const error = await response.json();
-                            alert('Ошибка: ' + (error.message || 'Неизвестная ошибка'));
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('Ошибка сети');
-                    }
-                });
-            }
-        function confirmDeleteEmployee(id, name) {
+function confirmDeleteRoom(roomId, roomName) {
+    roomToDelete = roomId;
+    document.getElementById('deleteConfirmationText').textContent = 
+        `Вы уверены, что хотите удалить помещение "${roomName}"?`;
+    
+    const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    deleteModal.show();
+}
+
+function deleteRoom(roomId) {
+    fetch(`/rooms/${roomId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Ошибка при удалении помещения');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ошибка при удалении помещения');
+    })
+    .finally(() => {
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+        deleteModal.hide();
+        roomToDelete = null;
+    });
+}
+
+function confirmDeleteEmployee(id, name) {
     employeeToDelete = id;
     document.getElementById('deleteConfirmationText').textContent = 
         `Вы уверены, что хотите удалить сотрудника "${name}"?`;
@@ -522,16 +450,6 @@
     deleteModal.show();
 }
 
-// В обработчике кнопки подтверждения удаления:
-confirmDeleteBtn.addEventListener('click', function() {
-    if (roomToDelete) {
-        deleteRoom(roomToDelete);
-    } else if (employeeToDelete) {
-        deleteEmployee(employeeToDelete);
-    }
-});
-
-// Функция удаления сотрудника
 function deleteEmployee(employeeId) {
     fetch(`/employees/${employeeId}`, {
         method: 'DELETE'
@@ -553,220 +471,174 @@ function deleteEmployee(employeeId) {
         employeeToDelete = null;
     });
 }
-        // Employee external toggle
-        const isExternalEmployee = document.getElementById('isExternalEmployee');
-        if (isExternalEmployee) {
-            isExternalEmployee.addEventListener('change', function() {
-                const externalFields = document.getElementById('externalEmployeeFields');
-                if (this.checked) {
-                    externalFields.style.display = 'block';
-                } else {
-                    externalFields.style.display = 'none';
-                    document.getElementById('externalEmployeeUrl').value = '';
-                }
-            });
-        }
-        
-        // Room external toggle
-        const isExternalRoom = document.getElementById('isExternalRoom');
-        if (isExternalRoom) {
-            isExternalRoom.addEventListener('change', function() {
-                const externalFields = document.getElementById('externalRoomFields');
-                if (this.checked) {
-                    externalFields.style.display = 'block';
-                } else {
-                    externalFields.style.display = 'none';
-                    document.getElementById('externalRoomUrl').value = '';
-                }
-            });
-        }
-        
-        // Room image preview
-        const roomImageInput = document.getElementById('roomImage');
-        if (roomImageInput) {
-            roomImageInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                const maxSize = 10 * 1024 * 1024; 
-                if (file.size > maxSize) {
-                    alert('Размер файла не должен превышать 10MB');
-                    e.target.value = '';
-                    return;
-                }
-                
-                reader.onload = function(e) {
-                    let previewContainer = document.getElementById('imagePreviewContainer');
-                    if (!previewContainer) {
-                        previewContainer = document.createElement('div');
-                        previewContainer.id = 'imagePreviewContainer';
-                        previewContainer.className = 'mt-2';
-                        document.querySelector('#addRoomModal .modal-body').appendChild(previewContainer);
-                    }
-                    
-                    previewContainer.innerHTML = '';
-                    
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'img-thumbnail';
-                    img.style.maxHeight = '200px';
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        // Parse room button
-        const parseRoomBtn = document.getElementById('parseRoomBtn');
-        if (parseRoomBtn) {
-            parseRoomBtn.addEventListener('click', async function() {
-                const url = document.getElementById('externalRoomUrl').value.trim();
-                if (!url) {
-                    alert('Пожалуйста, введите URL заведения на flamp.ru');
-                    return;
-                }
-                
-                if (!url.includes('flamp.ru')) {
-                    alert('Пожалуйста, введите корректную ссылку на flamp.ru');
-                    return;
-                }
-                
-                const btn = this;
-                const originalText = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
-                
-                try {
-                    const response = await fetch('/api/parse/flamp', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            url: url
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        document.getElementById('roomName').value = data.data.name || '';
-                        document.getElementById('roomAddress').value = data.data.address || '';
-                        document.getElementById('roomCapacity').value = data.data.capacity || 50;
-                        document.getElementById('roomDescription').value = data.data.description || '';
-                        document.getElementById('roomType').value = data.data.room_type_id || 1;
-                        
-                        let parsedDataField = document.getElementById('parsedDataField');
-                        if (!parsedDataField) {
-                            parsedDataField = document.createElement('input');
-                            parsedDataField.type = 'hidden';
-                            parsedDataField.id = 'parsedDataField';
-                            parsedDataField.name = 'parsed_data';
-                            document.getElementById('addRoomForm').appendChild(parsedDataField);
-                        }
-                        parsedDataField.value = JSON.stringify(data.data);
-                        
-                        document.getElementById('isExternalRoom').checked = true;
-                        document.getElementById('externalRoomFields').style.display = 'block';
-                        
-                        showAlert('Данные успешно загружены из flamp.ru', 'success');
-                    } else {
-                        showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка'), 'danger');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    showAlert('Ошибка при отправке запроса', 'danger');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }
-            });
-        }
-        
-        // Parse employee button
-        const parseEmployeeBtn = document.getElementById('parseEmployeeBtn');
-        if (parseEmployeeBtn) {
-                parseEmployeeBtn.addEventListener('click', async function() {
-    console.log('Кнопка "Заполнить" нажата'); // Проверка, что обработчик срабатывает
-    const url = document.getElementById('externalEmployeeUrl').value.trim();
-    console.log('URL:', url); // Проверка, что URL считывается правильно
 
-    if (!url) {
-        showAlert('Пожалуйста, введите URL резюме на hh.ru', 'danger');
-        return;
-    }
-
-    if (!url.includes('hh.ru/resume/')) {
-        showAlert('Некорректная ссылка на резюме. Пример: https://hh.ru/resume/123abc...', 'danger');
-        return;
-    }
-
-    console.log('Отправка запроса на /api/parse/hh...'); // Логируем перед fetch
-                
-                const btn = this;
-                const originalText = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
-                
-                try {
-                    const response = await fetch('/api/parse/hh', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            url: url
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        document.getElementById('employeeFullName').value = data.data.full_name || '';
-                        document.getElementById('employeePosition').value = data.data.position || '';
-                        document.getElementById('employeeContactInfo').value = data.data.contact_info || '';
-                        
-                        let parsedDataField = document.getElementById('parsedEmployeeDataField');
-                        if (!parsedDataField) {
-                            parsedDataField = document.createElement('input');
-                            parsedDataField.type = 'hidden';
-                            parsedDataField.id = 'parsedEmployeeDataField';
-                            parsedDataField.name = 'parsed_data';
-                            document.getElementById('addEmployeeForm').appendChild(parsedDataField);
-                        }
-                        parsedDataField.value = JSON.stringify(data.data);
-                        
-                        document.getElementById('isExternalEmployee').checked = true;
-                        document.getElementById('externalEmployeeFields').style.display = 'block';
-                        
-                        showAlert('Данные успешно загружены из hh.ru', 'success');
-                    } else {
-    showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка') + 
-              '. Убедитесь, что ссылка ведет на конкретное резюме.', 'danger');
-}
-                } catch (error) {
-                    console.error('Error:', error);
-                    showAlert('Ошибка при отправке запроса', 'danger');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }
-            });
+function applyRoomFilters() {
+    const nameFilter = document.getElementById('roomNameFilter')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('roomTypeFilter')?.value || '';
+    const capacityFilter = parseInt(document.getElementById('roomCapacityFilter')?.value) || 0;
+    const addressFilter = document.getElementById('roomAddressFilter')?.value.toLowerCase() || '';
+    const externalFilter = document.getElementById('roomExternalFilter')?.value || '';
+    
+    const rows = document.querySelectorAll('#roomsTable tbody tr');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        if (row.cells.length < 5) return;
+        
+        const name = row.cells[0].textContent.toLowerCase();
+        const type = row.cells[1].textContent;
+        const capacity = parseInt(row.cells[2].textContent) || 0;
+        const address = row.cells[3].textContent.toLowerCase();
+        const isExternal = row.cells[4].querySelector('.badge').textContent.includes('Внешний');
+        const externalValue = isExternal ? 'true' : 'false';
+        
+        const matchesName = !nameFilter || name.includes(nameFilter);
+        const matchesType = !typeFilter || type === typeFilter;
+        const matchesCapacity = !capacityFilter || capacity <= capacityFilter;
+        const matchesAddress = !addressFilter || address.includes(addressFilter);
+        const matchesExternal = !externalFilter || externalValue === externalFilter;
+        
+        if (matchesName && matchesType && matchesCapacity && matchesAddress && matchesExternal) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
         }
     });
     
-    // Show alert function
-    function showAlert(message, type) {
-    // Создаём элемент алерта
+    const noResultsRow = document.querySelector('#roomsTable tbody tr:last-child');
+    if (noResultsRow && noResultsRow.cells.length === 1) {
+        noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
+    }
+    
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+    if (filterModal) filterModal.hide();
+}
+
+function sortTable(tableId, columnIndex, sortKey) {
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not([style*="display: none"])'));
+    
+    const header = table.querySelector(`th[data-sort="${sortKey}"]`);
+    const currentOrder = header.getAttribute('data-order') || 'asc';
+    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    
+    table.querySelectorAll('th[data-sort]').forEach(th => th.removeAttribute('data-order'));
+    header.setAttribute('data-order', newOrder);
+    
+    rows.sort((a, b) => {
+        let aValue = a.cells[columnIndex].textContent.trim();
+        let bValue = b.cells[columnIndex].textContent.trim();
+        
+        if (sortKey === 'capacity') {
+            aValue = parseInt(aValue) || 0;
+            bValue = parseInt(bValue) || 0;
+        }
+        else if (sortKey === 'is_external') {
+            aValue = a.cells[columnIndex].querySelector('.badge').textContent.includes('Внешний') ? 1 : 0;
+            bValue = b.cells[columnIndex].querySelector('.badge').textContent.includes('Внешний') ? 1 : 0;
+        }
+        
+        if (aValue < bValue) return newOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return newOrder === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    while (tbody.firstChild) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+
+function resetRoomFilters() {
+    document.getElementById('roomNameFilter').value = '';
+    document.getElementById('roomTypeFilter').value = '';
+    document.getElementById('roomCapacityFilter').value = '';
+    document.getElementById('roomAddressFilter').value = '';
+    document.getElementById('roomExternalFilter').value = '';
+    
+    const rows = document.querySelectorAll('#roomsTable tbody tr');
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+    
+    const noResultsRow = document.querySelector('#roomsTable tbody tr:last-child');
+    if (noResultsRow && noResultsRow.cells.length === 1) {
+        noResultsRow.style.display = rows.length <= 1 ? '' : 'none';
+    }
+    
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+    if (filterModal) filterModal.hide();
+}
+
+function applyEmployeeFilters() {
+    const nameFilter = document.getElementById('employeeNameFilter')?.value.toLowerCase() || '';
+    const positionFilter = document.getElementById('employeePositionFilter')?.value.toLowerCase() || '';
+    const typeFilter = document.getElementById('employeeTypeFilter')?.value || '';
+    
+    const rows = document.querySelectorAll('#employeesTable tbody tr');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        if (row.cells.length < 5) return;
+        
+        const name = row.cells[0].textContent.toLowerCase();
+        const position = row.cells[1].textContent.toLowerCase();
+        const isExternal = row.cells[2].querySelector('.badge').textContent.includes('Внешний');
+        const externalValue = isExternal ? 'true' : 'false';
+        
+        const matchesName = !nameFilter || name.includes(nameFilter);
+        const matchesPosition = !positionFilter || position.includes(positionFilter);
+        const matchesType = !typeFilter || externalValue === typeFilter;
+        
+        if (matchesName && matchesPosition && matchesType) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    const noResultsRow = document.querySelector('#employeesTable tbody tr:last-child');
+    if (noResultsRow && noResultsRow.cells.length === 1) {
+        noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
+    }
+    
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('employeeFilterModal'));
+    if (filterModal) filterModal.hide();
+}
+
+function resetEmployeeFilters() {
+    document.getElementById('employeeNameFilter').value = '';
+    document.getElementById('employeePositionFilter').value = '';
+    document.getElementById('employeeTypeFilter').value = '';
+    
+    const rows = document.querySelectorAll('#employeesTable tbody tr');
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+    
+    const noResultsRow = document.querySelector('#employeesTable tbody tr:last-child');
+    if (noResultsRow && noResultsRow.cells.length === 1) {
+        noResultsRow.style.display = rows.length <= 1 ? '' : 'none';
+    }
+    
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById('employeeFilterModal'));
+    if (filterModal) filterModal.hide();
+}
+
+function showAlert(message, type) {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3`;
     alertDiv.role = 'alert';
-    alertDiv.style.position = 'fixed'; // Делаем фиксированным
-    alertDiv.style.top = '20px'; // Позиционируем сверху
-    alertDiv.style.right = '20px'; // И справа
-    alertDiv.style.zIndex = '9999'; // Поверх всех элементов
-    alertDiv.style.maxWidth = '400px'; // Ограничиваем ширину
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px'; 
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.maxWidth = '400px';
     
     alertDiv.innerHTML = `
         <div class="d-flex align-items-center">
@@ -775,171 +647,233 @@ function deleteEmployee(employeeId) {
         </div>
     `;
     
-    // Добавляем в body (всегда видно)
     document.body.appendChild(alertDiv);
     
-    // Автоматическое скрытие через 5 секунд
     setTimeout(() => {
         const bsAlert = new bootstrap.Alert(alertDiv);
         bsAlert.close();
     }, 5000);
 }
-    
-    // Employee filter functions
-    function applyEmployeeFilters() {
-        const nameFilter = document.getElementById('employeeNameFilter')?.value.toLowerCase() || '';
-        const positionFilter = document.getElementById('employeePositionFilter')?.value.toLowerCase() || '';
-        const typeFilter = document.getElementById('employeeTypeFilter')?.value || '';
-        
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const name = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
-            const position = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
-            const isExternal = row.querySelector('td:nth-child(3) span')?.textContent.includes('Внешний') || false;
-            
-            const matchesName = !nameFilter || name.includes(nameFilter);
-            const matchesPosition = !positionFilter || position.includes(positionFilter);
-            const matchesType = !typeFilter || 
-                              (typeFilter === 'true' && isExternal) || 
-                              (typeFilter === 'false' && !isExternal);
-            
-            row.style.display = matchesName && matchesPosition && matchesType ? '' : 'none';
-        });
-        
-        const noResultsDiv = document.getElementById('noEmployeesResults');
-        if (noResultsDiv) noResultsDiv.remove();
-        
-        const visibleRows = document.querySelectorAll('tbody tr:not([style*="display: none"])').length;
-        if (visibleRows === 0) {
-            const tbody = document.querySelector('tbody');
-            if (tbody) {
-                const message = document.createElement('tr');
-                message.id = 'noEmployeesResults';
-                message.innerHTML = '<td colspan="5" class="text-center">Сотрудники не найдены по заданным фильтрам</td>';
-                tbody.appendChild(message);
-            }
-        }
-        
-        const filterModal = bootstrap.Modal.getInstance(document.getElementById('employeeFilterModal'));
-        if (filterModal) filterModal.hide();
-    }
-    
-    function resetEmployeeFilters() {
-        const nameFilter = document.getElementById('employeeNameFilter');
-        const positionFilter = document.getElementById('employeePositionFilter');
-        const typeFilter = document.getElementById('employeeTypeFilter');
-        
-        if (nameFilter) nameFilter.value = '';
-        if (positionFilter) positionFilter.value = '';
-        if (typeFilter) typeFilter.value = '';
-        
-        document.querySelectorAll('tbody tr').forEach(row => {
-            row.style.display = '';
-        });
-        
-        const noResultsDiv = document.getElementById('noEmployeesResults');
-        if (noResultsDiv) noResultsDiv.remove();
-        
-        const filterModal = bootstrap.Modal.getInstance(document.getElementById('employeeFilterModal'));
-        if (filterModal) filterModal.hide();
-    }
-    
-    // Room filter functions
-    function applyRoomFilters() {
-        const nameFilter = document.getElementById('roomNameFilter')?.value.toLowerCase() || '';
-        const typeFilter = document.getElementById('roomTypeFilter')?.value || '';
-        const capacityFilter = parseInt(document.getElementById('roomCapacityFilter')?.value) || 0;
-        const addressFilter = document.getElementById('roomAddressFilter')?.value.toLowerCase() || '';
-        const externalFilter = document.getElementById('roomExternalFilter')?.value || '';
-        
-        let hasVisibleCards = false;
-        
-        document.querySelectorAll('.room-card').forEach(card => {
-            const name = card.dataset.name || '';
-            const type = card.dataset.type || '';
-            const capacity = parseInt(card.dataset.capacity) || 0;
-            const address = card.dataset.address || '';
-            const isExternal = card.dataset.external || 'false';
-            
-            const matchesName = !nameFilter || name.includes(nameFilter);
-            const matchesType = !typeFilter || type === typeFilter;
-            const matchesCapacity = capacity >= capacityFilter;
-            const matchesAddress = !addressFilter || address.includes(addressFilter);
-            const matchesExternal = !externalFilter || isExternal === externalFilter;
-            
-            if (matchesName && matchesType && matchesCapacity && matchesAddress && matchesExternal) {
-                card.style.display = 'block';
-                hasVisibleCards = true;
-            } else {
-                card.style.display = 'none';
-            }
-        });
-        
-        const noResultsDiv = document.getElementById('noResultsMessage');
-        if (noResultsDiv) noResultsDiv.remove();
-        
-        if (!hasVisibleCards) {
-            const container = document.getElementById('roomsContainer');
-            if (container) {
-                const message = document.createElement('div');
-                message.id = 'noResultsMessage';
-                message.className = 'col-12';
-                message.innerHTML = '<div class="alert alert-info">Помещения не найдены по заданным фильтрам</div>';
-                container.appendChild(message);
-            }
-        }
-        
-        const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
-        if (filterModal) filterModal.hide();
-    }
-    
-    function resetRoomFilters() {
-        const nameFilter = document.getElementById('roomNameFilter');
-        const typeFilter = document.getElementById('roomTypeFilter');
-        const capacityFilter = document.getElementById('roomCapacityFilter');
-        const addressFilter = document.getElementById('roomAddressFilter');
-        const externalFilter = document.getElementById('roomExternalFilter');
-        
-        if (nameFilter) nameFilter.value = '';
-        if (typeFilter) typeFilter.value = '';
-        if (capacityFilter) capacityFilter.value = '';
-        if (addressFilter) addressFilter.value = '';
-        if (externalFilter) externalFilter.value = '';
-        
-        document.querySelectorAll('.room-card').forEach(card => {
-            card.style.display = 'block';
-        });
-        
-        const noResultsDiv = document.getElementById('noResultsMessage');
-        if (noResultsDiv) noResultsDiv.remove();
-        
-        const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
-        if (filterModal) filterModal.hide();
-    }
-    
-    // Employee deletion
-    function confirmDeleteEmployee(id, name) {
-        if (confirm(`Вы уверены, что хотите удалить сотрудника "${name}"?`)) {
-            fetch(`/employees/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Ошибка при удалении сотрудника');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Ошибка при удалении сотрудника');
-            });
-        }
-    }
-    // Обработчик переключения внешнего сотрудника в форме редактирования
+
 document.addEventListener('DOMContentLoaded', function() {
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            if (roomToDelete) {
+                deleteRoom(roomToDelete);
+            } else if (employeeToDelete) {
+                deleteEmployee(employeeToDelete);
+            }
+        });
+    }
+    document.querySelectorAll('#roomsTable th[data-sort]').forEach((th, index) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+            const sortKey = th.getAttribute('data-sort');
+            sortTable('roomsTable', index, sortKey);
+        });
+    });
+    
+    document.querySelectorAll('#employeesTable th[data-sort]').forEach((th, index) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+            const sortKey = th.getAttribute('data-sort');
+            sortTable('employeesTable', index, sortKey);
+        });
+    });
+    
+    const isExternalEmployee = document.getElementById('isExternalEmployee');
+    if (isExternalEmployee) {
+        isExternalEmployee.addEventListener('change', function() {
+            const externalFields = document.getElementById('externalEmployeeFields');
+            if (this.checked) {
+                externalFields.style.display = 'block';
+            } else {
+                externalFields.style.display = 'none';
+                document.getElementById('externalEmployeeUrl').value = '';
+            }
+        });
+    }
+    
+    const isExternalRoom = document.getElementById('isExternalRoom');
+    if (isExternalRoom) {
+        isExternalRoom.addEventListener('change', function() {
+            const externalFields = document.getElementById('externalRoomFields');
+            if (this.checked) {
+                externalFields.style.display = 'block';
+            } else {
+                externalFields.style.display = 'none';
+                document.getElementById('externalRoomUrl').value = '';
+            }
+        });
+    }
+    
+    const roomImageInput = document.getElementById('roomImage');
+    if (roomImageInput) {
+        roomImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            const maxSize = 10 * 1024 * 1024; 
+            if (file.size > maxSize) {
+                alert('Размер файла не должен превышать 10MB');
+                e.target.value = '';
+                return;
+            }
+            
+            reader.onload = function(e) {
+                let previewContainer = document.getElementById('imagePreviewContainer');
+                if (!previewContainer) {
+                    previewContainer = document.createElement('div');
+                    previewContainer.id = 'imagePreviewContainer';
+                    previewContainer.className = 'mt-2';
+                    document.querySelector('#addRoomModal .modal-body').appendChild(previewContainer);
+                }
+                
+                previewContainer.innerHTML = '';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-thumbnail';
+                img.style.maxHeight = '200px';
+                previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    const parseRoomBtn = document.getElementById('parseRoomBtn');
+    if (parseRoomBtn) {
+        parseRoomBtn.addEventListener('click', async function() {
+            const url = document.getElementById('externalRoomUrl').value.trim();
+            if (!url) {
+                alert('Пожалуйста, введите URL заведения на flamp.ru');
+                return;
+            }
+            
+            if (!url.includes('flamp.ru')) {
+                alert('Пожалуйста, введите корректную ссылку на flamp.ru');
+                return;
+            }
+            
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
+            
+            try {
+                const response = await fetch('/api/parse/flamp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        url: url
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('roomName').value = data.data.name || '';
+                    document.getElementById('roomAddress').value = data.data.address || '';
+                    document.getElementById('roomCapacity').value = data.data.capacity || 50;
+                    document.getElementById('roomDescription').value = data.data.description || '';
+                    document.getElementById('roomType').value = data.data.room_type_id || 1;
+                    
+                    let parsedDataField = document.getElementById('parsedDataField');
+                    if (!parsedDataField) {
+                        parsedDataField = document.createElement('input');
+                        parsedDataField.type = 'hidden';
+                        parsedDataField.id = 'parsedDataField';
+                        parsedDataField.name = 'parsed_data';
+                        document.getElementById('addRoomForm').appendChild(parsedDataField);
+                    }
+                    parsedDataField.value = JSON.stringify(data.data);
+                    
+                    document.getElementById('isExternalRoom').checked = true;
+                    document.getElementById('externalRoomFields').style.display = 'block';
+                    
+                    showAlert('Данные успешно загружены из flamp.ru', 'success');
+                } else {
+                    showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Ошибка при отправке запроса', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
+    
+    const parseEmployeeBtn = document.getElementById('parseEmployeeBtn');
+    if (parseEmployeeBtn) {
+        parseEmployeeBtn.addEventListener('click', async function() {
+            const url = document.getElementById('externalEmployeeUrl').value.trim();
+            if (!url) {
+                showAlert('Пожалуйста, введите URL резюме на hh.ru', 'danger');
+                return;
+            }
+
+            if (!url.includes('hh.ru/resume/')) {
+                showAlert('Некорректная ссылка на резюме. Пример: https://hh.ru/resume/123abc...', 'danger');
+                return;
+            }
+                        
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
+            
+            try {
+                const response = await fetch('/api/parse/hh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        url: url
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('employeeFullName').value = data.data.full_name || '';
+                    document.getElementById('employeePosition').value = data.data.position || '';
+                    document.getElementById('employeeContactInfo').value = data.data.contact_info || '';
+                    
+                    let parsedDataField = document.getElementById('parsedEmployeeDataField');
+                    if (!parsedDataField) {
+                        parsedDataField = document.createElement('input');
+                        parsedDataField.type = 'hidden';
+                        parsedDataField.id = 'parsedEmployeeDataField';
+                        parsedDataField.name = 'parsed_data';
+                        document.getElementById('addEmployeeForm').appendChild(parsedDataField);
+                    }
+                    parsedDataField.value = JSON.stringify(data.data);
+                    
+                    document.getElementById('isExternalEmployee').checked = true;
+                    document.getElementById('externalEmployeeFields').style.display = 'block';
+                    
+                    showAlert('Данные успешно загружены из hh.ru', 'success');
+                } else {
+                    showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка') + 
+                              '. Убедитесь, что ссылка ведет на конкретное резюме.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Ошибка при отправке запроса', 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    }
+    
     {% for employee in employees %}
     const editIsExternal{{ employee.id }} = document.getElementById('editIsExternal{{ employee.id }}');
     if (editIsExternal{{ employee.id }}) {
@@ -952,10 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    {% endfor %}
     
-    // Обработчик отправки формы редактирования
-    {% for employee in employees %}
     const editEmployeeForm{{ employee.id }} = document.getElementById('editEmployeeForm{{ employee.id }}');
     if (editEmployeeForm{{ employee.id }}) {
         editEmployeeForm{{ employee.id }}.addEventListener('submit', async function(e) {
@@ -972,7 +903,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     const error = await response.json();
-                    showAlert('Ошибка при обновлении: ' + (error.error || 'Неизвестная ошибка'), 'danger');
+                    showAlert('Ошибка при обновлении: ' + (data.error || 'Неизвестная ошибка'), 'danger');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -981,7 +912,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     {% endfor %}
+    
+    const addEmployeeForm = document.getElementById('addEmployeeForm');
+    if (addEmployeeForm) {
+        addEmployeeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch('/employees/add', {
+                    method: 'POST',
+                    body: new FormData(this)
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const error = await response.json();
+                    alert('Ошибка: ' + (error.message || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ошибка сети');
+            }
+        });
+    }
 });
+const style = document.createElement('style');
+style.textContent = `
+th[data-sort] {
+    cursor: pointer;
+    position: relative;
+}
+
+th[data-sort]:hover {
+    background-color: #f8f9fa;
+}
+
+th[data-order]::after {
+    content: ' ↕';
+    font-size: 0.8em;
+    position: absolute;
+    right: 8px;
+}
+
+th[data-order="asc"]::after {
+    content: ' ↑';
+}
+
+th[data-order="desc"]::after {
+    content: ' ↓';
+}
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
 {% endblock %}

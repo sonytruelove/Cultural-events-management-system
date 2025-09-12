@@ -4,7 +4,6 @@
 <div class="container mt-4">
     <h1 class="mb-4">Деятельность организации</h1>
 
-    <!-- Назначение документа -->
     <div class="card purpose-card mb-4">
         <div class="card-body">
             <h4><i class="bi bi-journal-text"></i> Назначение документа</h4>
@@ -12,36 +11,32 @@
         </div>
     </div>
 
-    <!-- Период отчета и фильтры -->
     <div class="report-period">
         <div class="row g-3">
             <div class="col-md-3">
-                <label for="startDate" class="form-label">Период с</label>
-                <input type="date" class="form-control" id="startDate" required>
+                <label for="startDate" class="form-label fw-bold">Период с</label>
+                <input type="datetime-local" class="form-control" id="startDate" required>
             </div>
             <div class="col-md-3">
-                <label for="endDate" class="form-label">по</label>
-                <input type="date" class="form-control" id="endDate" required>
+                <label for="endDate" class="form-label fw-bold">по</label>
+                <input type="datetime-local" class="form-control" id="endDate" required>
             </div>
             <div class="col-md-6 d-flex align-items-end">
                 <button type="button" class="btn btn-primary me-2" id="generateReportBtn">
                     <i class="bi bi-file-earmark-text"></i> Сформировать отчет
                 </button>
-                <button type="button" class="btn btn-success" id="exportBtn" data-bs-toggle="modal"
-                    data-bs-target="#exportModal" disabled>
-                    <i class="bi bi-download"></i> Экспорт
+                <button type="button" class="btn btn-success" id="exportBtn" disabled>
+                    <i class="bi bi-download"></i> Экспорт отчета
                 </button>
             </div>
         </div>
         
-        <!-- Фильтры -->
         <div class="filter-options mt-3">
             <h5><i class="bi bi-gear"></i> Параметры формирования отчета</h5>
             
-            <!-- Выбор мероприятия -->
             <div class="row filter-row mb-3">
                 <div class="col-md-4">
-                    <label for="eventSelect" class="form-label">Мероприятие</label>
+                    <label for="eventSelect" class="form-label fw-bold">Мероприятие</label>
                     <select class="form-select" id="eventSelect">
                         <option value="all">Все мероприятия</option>
                         {% for event in events %}
@@ -51,11 +46,10 @@
                 </div>
             </div>
             
-            <!-- Выбор параметра фильтрации -->
             <div class="row filter-row mb-3">
                 <div class="col-md-4">
-                    <label for="filterType" class="form-label">Фильтровать по</label>
-                    <select class="form-select" id="filterType">
+                    <label for="filterType" class="form-label fw-bold">Фильтровать по</label>
+                    <select class="form-select" id="filterType" style="max-width: 250px;">
                         <option value="">Не выбрано</option>
                         <option value="room">Помещение</option>
                         <option value="employees">Сотрудники</option>
@@ -66,12 +60,10 @@
                 </div>
             </div>
             
-            <!-- Поле для значения фильтра (появляется после выбора параметра) -->
             <div class="row">
                 <div class="col-md-4">
-                    <!-- Помещение -->
                     <div class="filter-field mb-3" id="roomField" style="display: none;">
-                        <label for="roomSelect" class="form-label">Помещение</label>
+                        <label for="roomSelect" class="form-label fw-bold">Помещение</label>
                         <select class="form-select" id="roomSelect">
                             <option value="all">Все помещения</option>
                             {% for room in rooms %}
@@ -80,9 +72,8 @@
                         </select>
                     </div>
                     
-                    <!-- Сотрудники -->
                     <div class="filter-field mb-3" id="employeesField" style="display: none;">
-                        <label for="employeeSelect" class="form-label">Сотрудник</label>
+                        <label for="employeeSelect" class="form-label fw-bold">Сотрудник</label>
                         <select class="form-select" id="employeeSelect">
                             <option value="all">Все сотрудники</option>
                             {% for employee in employees %}
@@ -91,18 +82,16 @@
                         </select>
                     </div>
                     
-                    <!-- Количество участников -->
                     <div class="filter-field mb-3" id="participantsField" style="display: none;">
-                        <label for="participantsInput" class="form-label">Количество участников</label>
+                        <label for="participantsInput" class="form-label fw-bold">Количество участников</label>
                         <div class="input-group participants-input">
                             <input type="number" class="form-control" id="participantsInput" min="0" placeholder="Укажите число">
                             <span class="input-group-text">чел.</span>
                         </div>
                     </div>
                     
-                    <!-- Допустимый возраст -->
                     <div class="filter-field mb-3" id="ageField" style="display: none;">
-                        <label for="ageSelect" class="form-label">Допустимый возраст</label>
+                        <label for="ageSelect" class="form-label fw-bold">Допустимый возраст</label>
                         <select class="form-select" id="ageSelect">
                             <option value="all">Любой возраст</option>
                             {% for age in age_categories %}
@@ -111,9 +100,8 @@
                         </select>
                     </div>
                     
-                    <!-- Статус -->
                     <div class="filter-field mb-3" id="statusField" style="display: none;">
-                        <label for="statusSelect" class="form-label">Статус</label>
+                        <label for="statusSelect" class="form-label fw-bold">Статус</label>
                         <select class="form-select" id="statusSelect">
                             <option value="all">Все статусы</option>
                             {% for status in event_statuses %}
@@ -125,27 +113,25 @@
             </div>
         </div>
     </div>
-    <!-- Результаты отчета -->
     <div class="report-header mt-4 p-3 bg-light rounded">
-        <h4><i class="bi bi-file-earmark-text"></i> Отчет о мероприятиях</h4>
-        <p class="mb-1">Период: <strong id="reportPeriod">Не выбран</strong></p>
-        <p class="mb-1">Найдено мероприятий: <strong id="eventsCount">0</strong></p>
-        <p class="mb-0" id="additionalFilters" style="display: none;">Дополнительные фильтры: <strong id="filtersText">Нет</strong></p>
-    </div>
+    <h4><i class="bi bi-file-earmark-text"></i> Отчет о мероприятиях</h4>
+    <p class="mb-1">Период: <strong id="reportPeriod">Не выбран</strong></p>
+    <p class="mb-1">Найдено мероприятий: <strong id="eventsCount">0</strong></p>
+    <p class="mb-0" id="additionalFilters" style="display: none;">Параметры: <strong id="filtersText">Нет</strong></p>
+</div>
     
-    <!-- Таблица с результатами -->
-    <div class="table-responsive mt-3">
-        <table class="table table-bordered table-hover report-table">
+    <div class="table-responsive mt-3" id="reportTableContainer">
+        <table class="table table-bordered table-hover report-table" id="reportTable">
             <thead class="table-light">
                 <tr>
-                    <th class="text-center">№</th>
-                    <th class="text-left">Название</th>
-                    <th class="text-center">Даты проведения</th>
-                    <th class="text-center">Статус</th>
-                    <th class="text-center">Возраст</th>
-                    <th class="text-center">Участников</th>
-                    <th class="text-left">Тип</th>
-                    <th class="text-center">Помещение</th>
+                    <th class="text-center" data-sort="name">Название</th>
+                    <th class="text-center" data-sort="start_time">Дата начала</th>
+                    <th class="text-center" data-sort="end_time">Дата окончания</th>
+                    <th class="text-center" data-sort="status">Статус</th>
+                    <th class="text-center" data-sort="age_category">Возраст</th>
+                    <th class="text-center" data-sort="participants">Количество участников</th>
+                    <th class="text-center" data-sort="event_type">Тип</th>
+                    <th class="text-center" data-sort="room">Помещение</th>
                 </tr>
             </thead>
             <tbody>
@@ -156,7 +142,6 @@
         </table>
     </div>
     
-    <!-- Пагинация -->
     <nav aria-label="Page navigation" id="pagination" class="mt-3" style="display: none;">
         <ul class="pagination justify-content-center">
             <li class="page-item disabled">
@@ -219,37 +204,7 @@
     </div>
 </div>
 </div>
-    
-<!-- Модальное окно экспорта -->
-<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exportModalLabel"><i class="bi bi-download"></i> Экспорт отчета</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="exportFormat" class="form-label">Формат экспорта</label>
-                    <select class="form-select" id="exportFormat">
-                        <option value="excel">Excel (.xlsx)</option>
-                        <option value="pdf">PDF (.pdf)</option>
-                        <option value="csv">CSV (.csv)</option>
-                    </select>
-                </div>
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle"></i> Будет экспортирован отчет за выбранный период с учетом текущих фильтров.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-success" id="confirmExport">Экспортировать</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Модальное окно ошибки -->
 <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -270,24 +225,28 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
+Chart.register(ChartDataLabels);
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Устанавливаем даты по умолчанию (текущий месяц)
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     
-    document.getElementById('startDate').valueAsDate = firstDay;
-    document.getElementById('endDate').valueAsDate = lastDay;
+    const formatDateTimeForInput = (date) => {
+        return date.toISOString().slice(0, 16);
+    };
     
-    // Обработка выбора типа фильтра
+    document.getElementById('startDate').value = formatDateTimeForInput(firstDay);
+    document.getElementById('endDate').value = formatDateTimeForInput(lastDay);
+    
     document.getElementById('filterType').addEventListener('change', function() {
-        // Скрываем все поля фильтра
         document.querySelectorAll('.filter-field').forEach(field => {
             field.style.display = 'none';
         });
         
-        // Показываем соответствующее поле
         const selectedFilter = this.value;
         if (selectedFilter) {
             const field = document.getElementById(selectedFilter + 'Field');
@@ -297,26 +256,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Обработка формы генерации отчета
     document.getElementById('generateReportBtn').addEventListener('click', async function() {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
+        const startDateInput = document.getElementById('startDate').value;
+        const endDateInput = document.getElementById('endDate').value;
         const eventId = document.getElementById('eventSelect').value;
         const filterType = document.getElementById('filterType').value;
         let filterValue = '';
         
-        // Валидация дат
-        if (!startDate || !endDate) {
+        if (!startDateInput || !endDateInput) {
             showError('Пожалуйста, укажите период отчета');
             return;
         }
         
-        if (new Date(startDate) > new Date(endDate)) {
+        const startDate = new Date(startDateInput);
+        const endDate = new Date(endDateInput);
+        
+        if (startDate > endDate) {
             showError('Дата окончания не может быть раньше даты начала');
             return;
         }
+        const formatDateForServer = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        };
+
+        const formattedStartDate = formatDateForServer(startDate);
+        const formattedEndDate = formatDateForServer(endDate);
         
-        // Получаем значение фильтра в зависимости от типа
         if (filterType) {
             const filterField = document.getElementById(filterType + 'Field');
             if (filterField) {
@@ -333,16 +305,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Показываем индикатор загрузки
         const originalBtnText = this.innerHTML;
         this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Формирование отчета...';
         this.disabled = true;
         
         try {
-            // Формируем данные для отправки
             const formData = new FormData();
-            formData.append('start_date', startDate);
-            formData.append('end_date', endDate);
+            formData.append('start_date', formattedStartDate);
+            formData.append('end_date', formattedEndDate);
             if (eventId && eventId !== 'all') {
                 formData.append('event_id', eventId);
             }
@@ -368,8 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.success) {
                 updateReportTable(data.data, {
-                    startDate,
-                    endDate,
+                    startDate: formattedStartDate,
+                    endDate: formattedEndDate,
                     eventId,
                     filterType,
                     filterValue
@@ -382,121 +352,283 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             showError(error.message);
         } finally {
-            // Восстанавливаем кнопку
             this.innerHTML = originalBtnText;
             this.disabled = false;
         }
     });
     
-    // Обработка экспорта отчета
-    document.getElementById('confirmExport').addEventListener('click', function() {
-        const format = document.getElementById('exportFormat').value;
-        alert(`Функция экспорта в формате ${format.toUpperCase()} будет реализована в следующих версиях`);
-        bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        exportReportAsImage();
     });
     
-    // Функция обновления таблицы с результатами
-    function updateReportTable(data, filters) {
-        const tbody = document.querySelector('.report-table tbody');
-        tbody.innerHTML = '';
+    function exportReportAsImage() {
+        const reportContainer = document.getElementById('reportTableContainer');
+        const reportHeader = document.querySelector('.report-header');
         
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Нет данных для отображения</td></tr>';
-            document.getElementById('pagination').style.display = 'none';
-            return;
-        }
+        // Создаем временный контейнер для экспорта
+        const exportContainer = document.createElement('div');
+        exportContainer.style.position = 'absolute';
+        exportContainer.style.left = '-9999px';
+        exportContainer.style.backgroundColor = 'white';
+        exportContainer.style.padding = '20px';
+        exportContainer.style.boxSizing = 'border-box';
+        exportContainer.style.width = '800px';
         
-        data.forEach((event, index) => {
-            const row = document.createElement('tr');
+        // Клонируем заголовок отчета
+        const headerClone = reportHeader.cloneNode(true);
+        headerClone.classList.add('mb-3');
+        exportContainer.appendChild(headerClone);
+        
+        // Клонируем таблицу
+        const tableClone = reportContainer.cloneNode(true);
+        exportContainer.appendChild(tableClone);
+        
+        // Добавляем на страницу для рендеринга
+        document.body.appendChild(exportContainer);
+        
+        // Создаем изображение
+        html2canvas(exportContainer, {
+            scale: 2,
+            logging: false,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            // Удаляем временный контейнер
+            document.body.removeChild(exportContainer);
             
-            // Определяем класс для статуса
-            let statusClass = 'status-completed';
-            if (event.status === 'Запланировано') statusClass = 'status-planned';
-            else if (event.status === 'Активно') statusClass = 'status-active';
-            else if (event.status === 'Отменено') statusClass = 'status-cancelled';
+            // Создаем ссылку для скачивания
+            const link = document.createElement('a');
+            link.download = 'отчет_мероприятий.png';
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }).catch(error => {
+            console.error('Ошибка при создании изображения:', error);
+            showError('Не удалось создать изображение отчета');
             
-            row.innerHTML = `
-                <td class="text-center">${index + 1}</td>
-                <td class="text-center">${event.name || '—'}</td>
-                <td class="text-center">${event.start_date || '—'} - ${event.end_date || '—'}</td>
-                <td class="text-center"><span class="badge ${statusClass}">${event.status || '—'}</span></td>
-                <td class="text-center">${event.age_category || '—'}</td>
-                <td class="text-center">${event.participants || '—'}</td>
-                <td class="text-center">${event.event_type || '—'}</td>
-                <td class="text-center">${event.room || '—'}</td>
-            `;
-            
-            tbody.appendChild(row);
-        });
-        
-        // Обновляем информацию о периоде и количестве мероприятий
-        document.getElementById('reportPeriod').textContent = 
-            `${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}`;
-        
-        document.getElementById('eventsCount').textContent = data.length;
-        
-        // Обновляем информацию о фильтрах
-        const additionalFiltersEl = document.getElementById('additionalFilters');
-        const filtersTextEl = document.getElementById('filtersText');
-        let filtersText = [];
-        
-        if (filters.eventId && filters.eventId !== 'all') {
-            const eventName = document.getElementById('eventSelect').options[document.getElementById('eventSelect').selectedIndex].text;
-            filtersText.push(`Мероприятие: ${eventName}`);
-        }
-        
-        if (filters.filterType) {
-            let filterText = '';
-            switch (filters.filterType) {
-                case 'room':
-                    if (filters.filterValue !== 'all') {
-                        const roomName = document.getElementById('roomSelect').options[document.getElementById('roomSelect').selectedIndex].text;
-                        filterText = `Помещение: ${roomName}`;
-                    }
-                    break;
-                case 'employees':
-                    if (filters.filterValue !== 'all') {
-                        const employeeName = document.getElementById('employeeSelect').options[document.getElementById('employeeSelect').selectedIndex].text;
-                        filterText = `Сотрудник: ${employeeName}`;
-                    }
-                    break;
-                case 'participants':
-                    filterText = `Участников: ≥ ${filters.filterValue}`;
-                    break;
-                case 'age':
-                    if (filters.filterValue !== 'all') {
-                        const ageName = document.getElementById('ageSelect').options[document.getElementById('ageSelect').selectedIndex].text;
-                        filterText = `Возраст: ${ageName}`;
-                    }
-                    break;
-                case 'status':
-                    if (filters.filterValue !== 'all') {
-                        const statusName = document.getElementById('statusSelect').options[document.getElementById('statusSelect').selectedIndex].text;
-                        filterText = `Статус: ${statusName}`;
-                    }
-                    break;
+            // Удаляем временный контейнер в случае ошибки
+            if (document.body.contains(exportContainer)) {
+                document.body.removeChild(exportContainer);
             }
-            
-            if (filterText) filtersText.push(filterText);
-        }
-        
-        if (filtersText.length > 0) {
-            filtersTextEl.textContent = filtersText.join('; ');
-            additionalFiltersEl.style.display = 'block';
-        } else {
-            additionalFiltersEl.style.display = 'none';
-        }
-        
-        // Показываем/скрываем пагинацию в зависимости от количества результатов
-        document.getElementById('pagination').style.display = data.length > 15 ? 'block' : 'none';
-        updateCharts(data);
+        });
     }
     
-     // Инициализация диаграмм
+    function updateReportTable(data, filters) {
+    const tbody = document.querySelector('.report-table tbody');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Нет данных для отображения</td></tr>';
+        document.getElementById('pagination').style.display = 'none';
+        return;
+    }
+    
+    data.forEach((event, index) => {
+        const row = document.createElement('tr');
+        
+        const formatDateTimeDisplay = (dateTimeStr) => {
+            if (!dateTimeStr) return '—';
+            const date = new Date(dateTimeStr);
+            return date.toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+        
+        row.innerHTML = `
+            <td class="text-start">${event.name || '—'}</td>
+            <td class="text-center">${formatDateTimeDisplay(event.start_date) || '—'}</td>
+            <td class="text-center">${formatDateTimeDisplay(event.end_date) || '—'}</td>
+            <td class="text-center">
+                <span class="badge 
+                    ${event.status === 'Активно' ? 'bg-success' : 
+                      event.status === 'Завершено' ? 'bg-secondary' : 
+                      event.status === 'Отменено' ? 'bg-danger' : 
+                      event.status === 'Запланировано' ? 'bg-primary' : 'bg-light text-dark'}">
+                    ${event.status || '—'}
+                </span>
+            </td>
+            <td class="text-center">${event.age_category || '—'}</td>
+            <td class="text-end">${event.participants || '—'}</td>
+            <td class="text-start">${event.event_type || '—'}</td>
+            <td class="text-start">${event.room || '—'}</td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    const formatDateForDisplay = (dateTimeStr) => {
+        if (!dateTimeStr) return '';
+        const date = new Date(dateTimeStr);
+        return date.toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+    
+    document.getElementById('reportPeriod').textContent = 
+        `${formatDateForDisplay(filters.startDate)} - ${formatDateForDisplay(filters.endDate)}`;
+    
+    document.getElementById('eventsCount').textContent = data.length;
+    
+    const additionalFiltersEl = document.getElementById('additionalFilters');
+    const filtersTextEl = document.getElementById('filtersText');
+    
+    let filtersText = [];
+    
+    // Формируем текст для мероприятия
+    if (filters.eventId && filters.eventId !== 'all') {
+        const eventName = document.getElementById('eventSelect').options[document.getElementById('eventSelect').selectedIndex].text;
+        filtersText.push(`Мероприятие: ${eventName}`);
+    } else {
+        filtersText.push('Мероприятие: Все мероприятия');
+    }
+    
+    // Формируем текст для дополнительных фильтров
+    if (filters.filterType) {
+        let filterText = '';
+        switch (filters.filterType) {
+            case 'room':
+                if (filters.filterValue !== 'all') {
+                    const roomName = document.getElementById('roomSelect').options[document.getElementById('roomSelect').selectedIndex].text;
+                    filterText = `Помещение: ${roomName}`;
+                } else {
+                    filterText = 'Помещение: Все помещения';
+                }
+                break;
+            case 'employees':
+                if (filters.filterValue !== 'all') {
+                    const employeeName = document.getElementById('employeeSelect').options[document.getElementById('employeeSelect').selectedIndex].text;
+                    filterText = `Сотрудник: ${employeeName}`;
+                } else {
+                    filterText = 'Сотрудник: Все сотрудники';
+                }
+                break;
+            case 'participants':
+                filterText = `Участников: ≥ ${filters.filterValue}`;
+                break;
+            case 'age':
+                if (filters.filterValue !== 'all') {
+                    const ageName = document.getElementById('ageSelect').options[document.getElementById('ageSelect').selectedIndex].text;
+                    filterText = `Возраст: ${ageName}`;
+                } else {
+                    filterText = 'Возраст: Любой возраст';
+                }
+                break;
+            case 'status':
+                if (filters.filterValue !== 'all') {
+                    const statusName = document.getElementById('statusSelect').options[document.getElementById('statusSelect').selectedIndex].text;
+                    filterText = `Статус: ${statusName}`;
+                } else {
+                    filterText = 'Статус: Все статусы';
+                }
+                break;
+        }
+        
+        if (filterText) filtersText.push(filterText);
+    }
+    
+    if (filtersText.length > 0) {
+        filtersTextEl.textContent = filtersText.join('; ');
+        additionalFiltersEl.style.display = 'block';
+    } else {
+        additionalFiltersEl.style.display = 'none';
+    }
+    
+    document.getElementById('pagination').style.display = data.length > 15 ? 'block' : 'none';
+    updateCharts(data);
+    
+    // Добавляем обработчики сортировки для всех заголовков
+    document.querySelectorAll('#reportTable th[data-sort]').forEach(th => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', function() {
+            const sortKey = this.getAttribute('data-sort');
+            const currentOrder = this.getAttribute('data-order') || 'none';
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            
+            // Обновляем атрибуты data-order для всех заголовков
+            document.querySelectorAll('#reportTable th[data-sort]').forEach(header => {
+                if (header.getAttribute('data-sort') === sortKey) {
+                    header.setAttribute('data-order', newOrder);
+                } else {
+                    header.removeAttribute('data-order');
+                }
+            });
+            
+            sortTable(sortKey, newOrder);
+        });
+    });
+}
+    
+    function sortTable(sortKey, order) {
+        const table = document.getElementById('reportTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        if (rows.length === 0 || (rows.length === 1 && rows[0].cells.length === 1)) return;
+        
+        let columnIndex = 0;
+        document.querySelectorAll('#reportTable th[data-sort]').forEach((th, index) => {
+            if (th.getAttribute('data-sort') === sortKey) {
+                columnIndex = index;
+            }
+        });
+        
+        rows.sort((a, b) => {
+            let aValue = a.cells[columnIndex].textContent.trim();
+            let bValue = b.cells[columnIndex].textContent.trim();
+            
+            if (sortKey === 'start_time' || sortKey === 'end_time') {
+                const parseDate = (dateStr) => {
+                    if (!dateStr || dateStr === '—') return new Date(0);
+                    const [datePart, timePart] = dateStr.split(', ');
+                    const [day, month, year] = datePart.split('.');
+                    const [hours, minutes] = timePart.split(':');
+                    return new Date(year, month - 1, day, hours, minutes);
+                };
+                
+                aValue = parseDate(aValue);
+                bValue = parseDate(bValue);
+            } else if (sortKey === 'participants') {
+                aValue = parseInt(aValue) || 0;
+                bValue = parseInt(bValue) || 0;
+            } else if (sortKey === 'status') {
+                const statusOrder = {
+                    'Запланировано': 1,
+                    'Активно': 2,
+                    'Завершено': 3,
+                    'Отменено': 4
+                };
+                aValue = statusOrder[aValue] || 99;
+                bValue = statusOrder[bValue] || 99;
+            }
+            
+            let comparison = 0;
+            if (aValue < bValue) {
+                comparison = -1;
+            } else if (aValue > bValue) {
+                comparison = 1;
+            }
+            
+            return order === 'desc' ? comparison * -1 : comparison;
+        });
+        
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+        
+        rows.forEach(row => tbody.appendChild(row));
+    }
+    
     let statusChart, typeChart, timelineChart;
-        // Скрываем заглушки при успешной инициализации
-        statusPlaceholder.style.display = 'none';
-        typePlaceholder.style.display = 'none';
+    
     function initCharts() {
         const statusCtx = document.getElementById('statusChart').getContext('2d');
         const statusPlaceholder = document.getElementById('statusChartPlaceholder');
@@ -548,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        // Диаграмма типов мероприятий
+        
         const typeCtx = document.getElementById('typeChart').getContext('2d');
         const typePlaceholder = document.getElementById('typeChartPlaceholder');
         
@@ -594,119 +726,251 @@ document.addEventListener('DOMContentLoaded', function() {
                     legend: {
                         display: true,
                         position: 'bottom'
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        formatter: (value, context) => {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${percentage}%`;
+                        }
                     }
                 }
             }
         });
+        
         const timelineCtx = document.getElementById('timelineChart').getContext('2d');
-const timelinePlaceholder = document.getElementById('timelineChartPlaceholder');
+        const timelinePlaceholder = document.getElementById('timelineChartPlaceholder');
 
-timelineChart = new Chart(timelineCtx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Мероприятия по дням',
-            data: [],
-            fill: false,
-            borderColor: '#0d6efd',
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-                position: 'bottom'
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    precision: 0
+        timelineChart = new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Мероприятия по дням',
+                    data: [],
+                    fill: false,
+                    borderColor: '#0d6efd',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
                 }
             }
-        }
+        });
     }
+    document.getElementById('exportBtn').addEventListener('click', function() {
+    exportFullReportAsImage();
 });
+
+async function exportFullReportAsImage() {
+    const originalBtnText = this.innerHTML;
+    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Экспорт...';
+    this.disabled = true;
+
+    try {
+        const exportContainer = document.createElement('div');
+        exportContainer.style.position = 'absolute';
+        exportContainer.style.left = '-9999px';
+        exportContainer.style.backgroundColor = 'white';
+        exportContainer.style.padding = '20px';
+        exportContainer.style.boxSizing = 'border-box';
+        exportContainer.style.width = '1200px';
+
+        const reportHeader = document.querySelector('.report-header').cloneNode(true);
+        const reportTable = document.getElementById('reportTableContainer').cloneNode(true);
+        
+        const chartsContainer = document.createElement('div');
+        chartsContainer.style.marginTop = '20px';
+        
+        const statusCanvas = await createChartImage('statusChart');
+        const typeCanvas = await createChartImage('typeChart');
+        const timelineCanvas = await createChartImage('timelineChart');
+        
+        const statusTitle = document.createElement('h5');
+        statusTitle.textContent = 'Распределение мероприятий по статусам';
+        statusTitle.style.marginBottom = '15px';
+        
+        const typeTitle = document.createElement('h5');
+        typeTitle.textContent = 'Распределение по типам мероприятий';
+        typeTitle.style.marginBottom = '15px';
+        
+        const timelineTitle = document.createElement('h5');
+        timelineTitle.textContent = 'Мероприятия по дням';
+        timelineTitle.style.marginBottom = '15px';
+        
+        const firstRow = document.createElement('div');
+        firstRow.style.display = 'flex';
+        firstRow.style.justifyContent = 'space-between';
+        firstRow.style.marginBottom = '20px';
+        
+        const statusCol = document.createElement('div');
+        statusCol.style.width = '48%';
+        statusCol.appendChild(statusTitle.cloneNode(true));
+        statusCol.appendChild(statusCanvas);
+        
+        const typeCol = document.createElement('div');
+        typeCol.style.width = '48%';
+        typeCol.appendChild(typeTitle.cloneNode(true));
+        typeCol.appendChild(typeCanvas);
+        
+        firstRow.appendChild(statusCol);
+        firstRow.appendChild(typeCol);
+        
+        const secondRow = document.createElement('div');
+        secondRow.style.width = '100%';
+        secondRow.appendChild(timelineTitle);
+        secondRow.appendChild(timelineCanvas);
+        
+        chartsContainer.appendChild(firstRow);
+        chartsContainer.appendChild(secondRow);
+
+        exportContainer.appendChild(reportHeader);
+        exportContainer.appendChild(reportTable);
+        exportContainer.appendChild(chartsContainer);
+
+        document.body.appendChild(exportContainer);
+
+        const canvas = await html2canvas(exportContainer, {
+            scale: 2,
+            logging: false,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            allowTaint: true
+        });
+
+        document.body.removeChild(exportContainer);
+
+        const link = document.createElement('a');
+        link.download = 'полный_отчет_мероприятий.png';
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (error) {
+        console.error('Ошибка при создании изображения:', error);
+        showError('Не удалось создать изображение отчета');
+    } finally {
+        this.innerHTML = originalBtnText;
+        this.disabled = false;
     }
+}
+
+async function createChartImage(chartId) {
+    const chartCanvas = document.getElementById(chartId);
+    if (!chartCanvas) {
+        const placeholder = document.createElement('div');
+        placeholder.style.width = '400px';
+        placeholder.style.height = '300px';
+        placeholder.style.backgroundColor = '#f8f9fa';
+        placeholder.style.display = 'flex';
+        placeholder.style.alignItems = 'center';
+        placeholder.style.justifyContent = 'center';
+        placeholder.style.border = '1px solid #dee2e6';
+        placeholder.innerHTML = '<div style="text-align: center; color: #6c757d;"><i class="bi bi-bar-chart" style="font-size: 2rem;"></i><p>Данные не доступны</p></div>';
+        return placeholder;
+    }
+
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = chartCanvas.width;
+    exportCanvas.height = chartCanvas.height;
     
-function updateCharts(data) {
-    const statusPlaceholder = document.getElementById('statusChartPlaceholder');
-    const typePlaceholder = document.getElementById('typeChartPlaceholder');
-    const timelinePlaceholder = document.getElementById('timelineChartPlaceholder');
+    const ctx = exportCanvas.getContext('2d');
+    ctx.drawImage(chartCanvas, 0, 0);
     
+    const container = document.createElement('div');
+    container.style.width = exportCanvas.width + 'px';
+    container.style.height = exportCanvas.height + 'px';
+    
+    const img = document.createElement('img');
+    img.src = exportCanvas.toDataURL('image/png');
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain';
+    
+    container.appendChild(img);
+    return container;
+}
+    function updateCharts(data) {
+        const statusPlaceholder = document.getElementById('statusChartPlaceholder');
+        const typePlaceholder = document.getElementById('typeChartPlaceholder');
+        const timelinePlaceholder = document.getElementById('timelineChartPlaceholder');
+        
         if (!data || data.length === 0) {
-            // Показываем заглушки, если нет данных
             statusPlaceholder.style.display = 'block';
             typePlaceholder.style.display = 'block';
             timelinePlaceholder.style.display = 'block';
             
             if (statusChart) statusChart.destroy();
             if (typeChart) typeChart.destroy();
+            if (timelineChart) timelineChart.destroy();
             return;
         }
+        
         statusPlaceholder.style.display = 'none';
         typePlaceholder.style.display = 'none';
         timelinePlaceholder.style.display = 'none';
-        if (!statusChart || !typeChart) {
+        
+        if (!statusChart || !typeChart || !timelineChart) {
             initCharts();
         }
         
-        // Подготовка данных для диаграммы статусов
         const statusCounts = {};
         const typeCounts = {};
         
         data.forEach(event => {
-            // Статусы
             const status = event.status || 'Не указано';
             statusCounts[status] = (statusCounts[status] || 0) + 1;
             
-            // Типы
             const eventType = event.event_type || 'Не указано';
             typeCounts[eventType] = (typeCounts[eventType] || 0) + 1;
         });
         
-        // Обновляем диаграмму статусов
         statusChart.data.labels = Object.keys(statusCounts);
         statusChart.data.datasets[0].data = Object.values(statusCounts);
         statusChart.update();
         
-        // Обновляем диаграмму типов
         typeChart.data.labels = Object.keys(typeCounts);
         typeChart.data.datasets[0].data = Object.values(typeCounts);
         typeChart.update();
 
         const dateCounts = {};
-    data.forEach(event => {
-        const date = event.start_date.split('T')[0]; // Упрощаем дату, если нужно
-        dateCounts[date] = (dateCounts[date] || 0) + 1;
-    });
+        data.forEach(event => {
+            if (event.start_date) {
+                const date = event.start_date.split('T')[0];
+                dateCounts[date] = (dateCounts[date] || 0) + 1;
+            }
+        });
 
-    // Сортируем даты
-    const sortedDates = Object.keys(dateCounts).sort();
-    const counts = sortedDates.map(date => dateCounts[date]);
+        const sortedDates = Object.keys(dateCounts).sort();
+        const counts = sortedDates.map(date => dateCounts[date]);
 
-    // Обновляем график временного ряда
-    timelineChart.data.labels = sortedDates;
-    timelineChart.data.datasets[0].data = counts;
-    timelineChart.update();
-
+        timelineChart.data.labels = sortedDates;
+        timelineChart.data.datasets[0].data = counts;
+        timelineChart.update();
     }
     
-    // Инициализация диаграмм при загрузке страницы
     initCharts();
 
-    // Функция форматирования даты (YYYY-MM-DD -> DD.MM.YYYY)
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const [year, month, day] = dateString.split('-');
-        return `${day}.${month}.${year}`;
-    }
-    
-    // Функция показа ошибки
     function showError(message) {
         document.getElementById('errorMessage').textContent = message;
         const modal = new bootstrap.Modal(document.getElementById('errorModal'));
@@ -715,4 +979,29 @@ function updateCharts(data) {
 
 });
 </script>
+
+<style>
+th[data-sort] {
+    position: relative;
+    cursor: pointer;
+}
+
+th[data-sort]:hover {
+    background-color: #f8f9fa;
+}
+
+th[data-sort]:hover::after {
+    opacity: 0.6;
+}
+
+th[data-order="asc"]::after {
+    content: "↑";
+    opacity: 1;
+}
+
+th[data-order="desc"]::after {
+    content: "↓";
+    opacity: 1;
+}
+</style>
 {% endblock %}

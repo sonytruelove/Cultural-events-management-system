@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Герой-секция -->
 <section class="hero-section">
     <div class="container text-center">
         <h1 class="display-4 mb-4">Добро пожаловать, {{ current_user.full_name }}!</h1>
@@ -32,13 +31,11 @@
     </div>
 </section>
 
-<!-- Основной контент -->
 <div class="container mb-5">
     <div class="row">
         <div class="col-lg-8">
             <h2 class="mb-4">Ближайшие мероприятия</h2>
             
-            <!-- В секции ближайших мероприятий -->
             {% for event in upcoming_events %}
             <div class="card event-card mb-3">
                 <div class="card-header bg-primary text-white">
@@ -66,16 +63,16 @@
                 </div>
                 <div class="card-body quick-actions">
                     <a href="/events?show_modal=true" class="btn btn-success w-100 mb-2">
-                        <i class="bi bi-plus-circle"></i> Создать мероприятие
+                        <i class="bi bi-plus-circle"></i><span> Создать мероприятие </strong>
                     </a>
                     <a href="{{ url_for('rooms') }}" class="btn btn-outline-secondary w-100 mb-2">
-                        <i class="bi bi-house"></i> Управление помещениями
+                        <i class="bi bi-house"></i><span style="color:black"> Управление помещениями </span>
                     </a>
                     <a href="{{ url_for('rooms') }}" class="btn btn-outline-secondary w-100 mb-2">
-                        <i class="bi bi-people"></i> Управление сотрудниками
+                        <i class="bi bi-people"></i> <span style="color:black"> Управление сотрудниками </span>
                     </a>
                     <a href="{{ url_for('activity') }}" class="btn btn-outline-secondary w-100 mb-2">
-                        <i class="bi bi-graph-up"></i> Деятельность
+                        <i class="bi bi-graph-up"></i> <span style="color:black"> Деятельность </span>
                     </a>
                 </div>
                 {% endif %}
