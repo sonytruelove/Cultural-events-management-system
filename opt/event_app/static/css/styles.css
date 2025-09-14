@@ -11,7 +11,6 @@
     margin-bottom: 1rem;
 }
 
-
 .feature-card {
     transition: transform 0.3s;
     height: 100%;
@@ -81,7 +80,7 @@
 
 .nav-link i {
     margin-right: 8px;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     color: #0d6efd;
 }
 
@@ -96,11 +95,6 @@
 .navbar-nav {
     width: 100%;
     justify-content: space-around;
-}
-
-.navbar-nav .nav-link {
-    color:black;
-
 }
 
 .event-card {

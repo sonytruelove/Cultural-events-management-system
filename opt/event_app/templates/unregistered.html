@@ -1,11 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Герой-секция -->
+<!-- Герой-секция с кнопками авторизации -->
 <section class="hero-section">
     <div class="container text-center">
         <h1 class="display-4 mb-4">Система управления мероприятиями</h1>
         <p class="lead mb-5">Профессиональный инструмент для организации и управления культурно-массовыми мероприятиями вашей организации</p>
+        
+        <!-- Кнопки авторизации добавлены в герой-секцию -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8 col-lg-6">
+                <div class="d-grid gap-2 d-md-flex justify-content-center">
+                    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="bi bi-box-arrow-in-right"></i> Войти в систему
+                    </button>
+                    <button class="btn btn-warning btn-lg" onclick="fillAdminCredentials()">
+                        <i class="bi bi-person-check"></i> Быстрый вход для администратора
+                    </button>
+                </div>
+            </div>
+        </div>
+        
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="card feature-card p-4">
@@ -68,7 +83,7 @@
                     <div class="step-number">2</div>
                     <div>
                         <h5>Нажмите кнопку "Войти"</h5>
-                        <p>Используйте кнопку ниже для открытия формы входа</p>
+                        <p>Используйте кнопку в верхней части страницы для открытия формы входа</p>
                     </div>
                 </div>
 
@@ -80,14 +95,7 @@
                     </div>
                 </div>
 
-                <div class="d-grid gap-2 mt-4">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="bi bi-box-arrow-in-right"></i> Войти в систему
-                    </button>
-                    <button class="btn btn-warning" onclick="fillAdminCredentials()">
-                        <i class="bi bi-person-check"></i> Быстрый вход для администратора
-                    </button>
-                </div>
+                <!-- Удалены дублирующиеся кнопки из этой секции -->
             </div>
         </div>
     </div>
