@@ -283,7 +283,7 @@
                                 <i class="bi bi-plus-lg"></i>
                             </button>
                         </div>
-                        <div class="form-text">Или создайте новую должность</div>
+                        <div class="form-text">Или создайте запись о новой должности</div>
                     </div>
                     
                     <div class="mb-3">
@@ -365,7 +365,7 @@
                                         <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </div>
-                                <div class="form-text">Или создайте новую должность</div>
+                                <div class="form-text">Или создайте запись о новой должности</div>
                             </div>
                         </div>
                         
@@ -373,13 +373,6 @@
                             <div class="mb-3">
                                 <label for="employeeContactInfo" class="form-label fw-bold">Контактная информация</label>
                                 <input type="text" class="form-control" id="employeeContactInfo" name="contact_info">
-                            </div>
-                            
-                            <!-- Добавляем поле для новой должности -->
-                            <div class="mb-3">
-                                <label for="newPositionInput" class="form-label fw-bold">Или введите новую должность</label>
-                                <input type="text" class="form-control" id="newPositionInput" name="new_position" placeholder="Название новой должности">
-                                <div class="form-text">Если нужной должности нет в списке выше</div>
                             </div>
                         </div>
                     </div>
@@ -472,7 +465,6 @@
         </div>
     </div>
 </div>
-
 {% block scripts %}
 <script>
 let roomToDelete = null;
@@ -505,6 +497,7 @@ function showAddPositionModal(targetSelectId) {
         addPositionModal.style.zIndex = '';
     });
 }
+
 async function addNewPosition() {
     const positionNameInput = document.getElementById('newPositionName');
     const positionName = positionNameInput.value.trim();
@@ -725,6 +718,7 @@ function resetRoomFilters() {
     const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
     if (filterModal) filterModal.hide();
 }
+
 function applyEmployeeFilters() {
     const nameFilter = document.getElementById('employeeNameFilter')?.value.toLowerCase() || '';
     const positionFilter = document.getElementById('employeePositionFilter')?.value || '';
@@ -806,6 +800,209 @@ function showAlert(message, type) {
     }, 5000);
 }
 
+// Функции для парсинга данных
+async function parseRoomData() {
+    const url = document.getElementById('externalRoomUrl').value.trim();
+    if (!url) {
+        showAlert('Пожалуйста, введите URL заведения на flamp.ru', 'danger');
+        return;
+    }
+    
+    if (!url.includes('flamp.ru')) {
+        showAlert('Пожалуйста, введите корректную ссылку на flamp.ru', 'danger');
+        return;
+    }
+    
+    const btn = document.getElementById('parseRoomBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
+    
+    try {
+        const response = await fetch('/api/parse/flamp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                url: url
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('roomName').value = data.data.name || '';
+            document.getElementById('roomAddress').value = data.data.address || '';
+            document.getElementById('roomCapacity').value = data.data.capacity || 50;
+            document.getElementById('roomDescription').value = data.data.description || '';
+            document.getElementById('roomType').value = data.data.room_type_id || 1;
+            
+            let parsedDataField = document.getElementById('parsedDataField');
+            if (!parsedDataField) {
+                parsedDataField = document.createElement('input');
+                parsedDataField.type = 'hidden';
+                parsedDataField.id = 'parsedDataField';
+                parsedDataField.name = 'parsed_data';
+                document.getElementById('addRoomForm').appendChild(parsedDataField);
+            }
+            parsedDataField.value = JSON.stringify(data.data);
+            
+            document.getElementById('isExternalRoom').checked = true;
+            document.getElementById('externalRoomFields').style.display = 'block';
+            
+            showAlert('Данные успешно загружены из flamp.ru', 'success');
+        } else {
+            showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка'), 'danger');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Ошибка при отправке запроса', 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+async function parseEmployeeData() {
+    const url = document.getElementById('externalEmployeeUrl').value.trim();
+    if (!url) {
+        showAlert('Пожалуйста, введите URL резюме на hh.ru', 'danger');
+        return;
+    }
+
+    if (!url.includes('hh.ru/resume/')) {
+        showAlert('Некорректная ссылка на резюме. Пример: https://hh.ru/resume/123abc...', 'danger');
+        return;
+    }
+                    
+    const btn = document.getElementById('parseEmployeeBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
+    
+    try {
+        const response = await fetch('/api/parse/hh', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                url: url
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('employeeFullName').value = data.data.full_name || '';
+            
+            // Устанавливаем значение в select должности
+            const positionSelect = document.getElementById('employeePositionSelect');
+            if (positionSelect && data.data.position) {
+                // Ищем существующую должность
+                const existingOption = Array.from(positionSelect.options).find(option => 
+                    option.text === data.data.position
+                );
+                
+                if (existingOption) {
+                    positionSelect.value = existingOption.value;
+                } else {
+                    // Если должности нет, создаем новую опцию
+                    const newOption = new Option(data.data.position, '');
+                    positionSelect.add(newOption);
+                    positionSelect.value = '';
+                    // Сохраняем название должности для дальнейшего создания
+                    document.getElementById('employeePositionSelect').setAttribute('data-temp-value', data.data.position);
+                }
+            }
+            
+            document.getElementById('employeeContactInfo').value = data.data.contact_info || '';
+            
+            let parsedDataField = document.getElementById('parsedEmployeeDataField');
+            if (!parsedDataField) {
+                parsedDataField = document.createElement('input');
+                parsedDataField.type = 'hidden';
+                parsedDataField.id = 'parsedEmployeeDataField';
+                parsedDataField.name = 'parsed_data';
+                document.getElementById('addEmployeeForm').appendChild(parsedDataField);
+            }
+            parsedDataField.value = JSON.stringify(data.data);
+            
+            document.getElementById('isExternalEmployee').checked = true;
+            document.getElementById('externalEmployeeFields').style.display = 'block';
+            
+            showAlert('Данные успешно загружены из hh.ru', 'success');
+        } else {
+            showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка') + 
+                      '. Убедитесь, что ссылка ведет на конкретное резюме.', 'danger');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Ошибка при отправке запроса', 'danger');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// Обработчики событий для форм редактирования сотрудников
+function setupEmployeeFormHandlers() {
+    {% for employee in employees %}
+    const editEmployeeForm{{ employee.id }} = document.getElementById('editEmployeeForm{{ employee.id }}');
+    if (editEmployeeForm{{ employee.id }}) {
+        editEmployeeForm{{ employee.id }}.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const errorData = await response.json();
+                    showAlert('Ошибка при обновлении: ' + (errorData.error || 'Неизвестная ошибка'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Ошибка сети', 'danger');
+            }
+        });
+    }
+    {% endfor %}
+}
+
+// Обработчик для формы добавления сотрудника
+function setupAddEmployeeFormHandler() {
+    const addEmployeeForm = document.getElementById('addEmployeeForm');
+    if (addEmployeeForm) {
+        addEmployeeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch('/employees/add', {
+                    method: 'POST',
+                    body: new FormData(this)
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const errorData = await response.json();
+                    showAlert('Ошибка: ' + (errorData.message || 'Неизвестная ошибка'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Ошибка сети', 'danger');
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     if (confirmDeleteBtn) {
@@ -867,6 +1064,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Обработчики для кнопок парсинга
+    const parseRoomBtn = document.getElementById('parseRoomBtn');
+    if (parseRoomBtn) {
+        parseRoomBtn.addEventListener('click', parseRoomData);
+    }
+    
+    const parseEmployeeBtn = document.getElementById('parseEmployeeBtn');
+    if (parseEmployeeBtn) {
+        parseEmployeeBtn.addEventListener('click', parseEmployeeData);
+    }
+    
+    // Настройка обработчиков сортировки таблиц
     document.querySelectorAll('th[data-sort]').forEach(th => {
         th.style.cursor = 'pointer';
         th.addEventListener('click', function() {
@@ -876,6 +1085,10 @@ document.addEventListener('DOMContentLoaded', function() {
             sortTable(tableId, columnIndex, sortKey);
         });
     });
+    
+    // Настройка обработчиков форм
+    setupEmployeeFormHandlers();
+    setupAddEmployeeFormHandler();
 });
 </script>
 <style>
