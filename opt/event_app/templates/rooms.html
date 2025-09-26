@@ -86,7 +86,7 @@
                 <thead class="table-light">
                     <tr>
                         <th data-sort="full_name">ФИО</th>
-                        <th data-sort="position">Должность</th>
+                        <th data-sort="position_name">Должность</th>
                         <th data-sort="is_external">Тип</th>
                         <th data-sort="contact_info">Контакты</th>
                         <th>Действия</th>
@@ -96,7 +96,7 @@
                     {% for employee in employees %}
                     <tr>
                         <td>{{ employee.full_name }}</td>
-                        <td>{{ employee.position }}</td>
+                        <td>{{ employee.position_name or employee.position }}</td>
                         <td>
                             <span class="badge {{ 'bg-warning' if employee.is_external else 'bg-success' }}">
                                 {{ 'Внешний' if employee.is_external else 'Внутренний' }}
@@ -125,6 +125,7 @@
     </div>
 </div> 
 
+<!-- Модальные окна для помещений (без изменений) -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -247,6 +248,8 @@
         </div>
     </div>
 </div>
+
+<!-- Модальные окна для редактирования сотрудников (обновленные) -->
 {% for employee in employees %}
 <div class="modal fade" id="editEmployeeModal{{ employee.id }}" tabindex="-1" aria-labelledby="editEmployeeModalLabel{{ employee.id }}" aria-hidden="true">
     <div class="modal-dialog">
@@ -262,21 +265,39 @@
                         <input type="text" class="form-control" id="editFullName{{ employee.id }}" 
                                name="full_name" value="{{ employee.full_name }}" required>
                     </div>
+                    
                     <div class="mb-3">
-                        <label for="editPosition{{ employee.id }}" class="form-label fw-bold">Должность*</label>
-                        <input type="text" class="form-control" id="editPosition{{ employee.id }}" 
-                               name="position" value="{{ employee.position }}" required>
+                        <label class="form-label fw-bold">Должность*</label>
+                        <div class="input-group">
+                            <select class="form-select" id="editPositionSelect{{ employee.id }}" name="position_id">
+                                <option value="">Выберите должность</option>
+                                {% for position in positions %}
+                                    <option value="{{ position.id }}" 
+                                        {{ 'selected' if employee.position_id == position.id else '' }}>
+                                        {{ position.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-outline-secondary" 
+                                    onclick="showAddPositionModal('editPositionSelect{{ employee.id }}')">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Или создайте новую должность</div>
                     </div>
+                    
                     <div class="mb-3">
                         <label for="editContactInfo{{ employee.id }}" class="form-label fw-bold">Контактная информация</label>
                         <input type="text" class="form-control" id="editContactInfo{{ employee.id }}" 
                                name="contact_info" value="{{ employee.contact_info or '' }}">
                     </div>
+                    
                     <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" id="editIsExternal{{ employee.id }}" 
                                name="is_external" {{ 'checked' if employee.is_external else '' }}>
                         <label class="form-check-label" for="editIsExternal{{ employee.id }}">Внешний сотрудник</label>
                     </div>
+                    
                     <div class="mb-3" id="editExternalUrlContainer{{ employee.id }}" 
                          style="{{ 'display: block;' if employee.is_external else 'display: none;' }}">
                         <label for="editExternalUrl{{ employee.id }}" class="form-label fw-bold">Ссылка на внешний ресурс</label>
@@ -293,41 +314,8 @@
     </div>
 </div>
 {% endfor %}
-<div class="modal fade" id="employeeFilterModal" tabindex="-1" aria-labelledby="employeeFilterModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="employeeFilterModalLabel">Фильтры сотрудников</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="employeeFilterForm">
-                    <div class="mb-3">
-                        <label for="employeeNameFilter" class="form-label fw-bold">ФИО</label>
-                        <input type="text" class="form-control" id="employeeNameFilter" placeholder="Поиск по ФИО">
-                    </div>
-                    <div class="mb-3">
-                        <label for="employeePositionFilter" class="form-label fw-bold">Должность</label>
-                        <input type="text" class="form-control" id="employeePositionFilter" placeholder="Поиск по должности">
-                    </div>
-                    <div class="mb-3">
-                        <label for="employeeTypeFilter" class="form-label fw-bold">Тип сотрудника</label>
-                        <select class="form-select" id="employeeTypeFilter" style="max-width: 150px;">
-                            <option value="">Все</option>
-                            <option value="false">Внутренние</option>
-                            <option value="true">Внешние</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="resetEmployeeFilters()">Сбросить</button>
-                <button type="button" class="btn btn-primary" onclick="applyEmployeeFilters()">Применить</button>
-            </div>
-        </div>
-    </div>
-</div>
 
+<!-- Модальное окно для добавления сотрудника (исправленное) -->
 <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -362,15 +350,36 @@
                                 <label for="employeeFullName" class="form-label fw-bold">ФИО*</label>
                                 <input type="text" class="form-control" id="employeeFullName" name="full_name" required>
                             </div>
+                            
                             <div class="mb-3">
-                                <label for="employeePosition" class="form-label fw-bold">Должность*</label>
-                                <input type="text" class="form-control" id="employeePosition" name="position" required>
+                                <label class="form-label fw-bold">Должность*</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="employeePositionSelect" name="position_id">
+                                        <option value="">Выберите должность</option>
+                                        {% for position in positions %}
+                                            <option value="{{ position.id }}">{{ position.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary" 
+                                            onclick="showAddPositionModal('employeePositionSelect')">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Или создайте новую должность</div>
                             </div>
                         </div>
+                        
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="employeeContactInfo" class="form-label fw-bold">Контактная информация</label>
                                 <input type="text" class="form-control" id="employeeContactInfo" name="contact_info">
+                            </div>
+                            
+                            <!-- Добавляем поле для новой должности -->
+                            <div class="mb-3">
+                                <label for="newPositionInput" class="form-label fw-bold">Или введите новую должность</label>
+                                <input type="text" class="form-control" id="newPositionInput" name="new_position" placeholder="Название новой должности">
+                                <div class="form-text">Если нужной должности нет в списке выше</div>
                             </div>
                         </div>
                     </div>
@@ -380,6 +389,68 @@
                     <button type="submit" class="btn btn-success">Добавить</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления новой должности -->
+<div class="modal fade" id="addPositionModal" tabindex="-1" aria-labelledby="addPositionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPositionModalLabel">Добавить новую должность</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newPositionName" class="form-label fw-bold">Название должности*</label>
+                    <input type="text" class="form-control" id="newPositionName" placeholder="Введите название должности">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" onclick="addNewPosition()">Добавить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="employeeFilterModal" tabindex="-1" aria-labelledby="employeeFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeFilterModalLabel">Фильтры сотрудников</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeFilterForm">
+                    <div class="mb-3">
+                        <label for="employeeNameFilter" class="form-label fw-bold">ФИО</label>
+                        <input type="text" class="form-control" id="employeeNameFilter" placeholder="Поиск по ФИО">
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeePositionFilter" class="form-label fw-bold">Должность</label>
+                        <select class="form-select" id="employeePositionFilter">
+                            <option value="">Все должности</option>
+                            {% for position in positions %}
+                                <option value="{{ position.name }}">{{ position.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeeTypeFilter" class="form-label fw-bold">Тип сотрудника</label>
+                        <select class="form-select" id="employeeTypeFilter" style="max-width: 150px;">
+                            <option value="">Все</option>
+                            <option value="false">Внутренние</option>
+                            <option value="true">Внешние</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="resetEmployeeFilters()">Сбросить</button>
+                <button type="button" class="btn btn-primary" onclick="applyEmployeeFilters()">Применить</button>
+            </div>
         </div>
     </div>
 </div>
@@ -406,6 +477,88 @@
 <script>
 let roomToDelete = null;
 let employeeToDelete = null;
+let targetSelectElement = null;
+
+function showAddPositionModal(targetSelectId) {
+    targetSelectElement = targetSelectId;
+    const addPositionModal = document.getElementById('addPositionModal');
+    
+    // Устанавливаем высокий z-index для модального окна добавления должности
+    addPositionModal.style.zIndex = '9999';
+    
+    // Создаем затемненный фон с более высоким z-index
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    backdrop.style.zIndex = '9998';
+    backdrop.id = 'positionModalBackdrop';
+    document.body.appendChild(backdrop);
+    
+    const modal = new bootstrap.Modal(addPositionModal);
+    modal.show();
+    
+    // Обработчик закрытия модального окна
+    addPositionModal.addEventListener('hidden.bs.modal', function() {
+        const backdrop = document.getElementById('positionModalBackdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        addPositionModal.style.zIndex = '';
+    });
+}
+async function addNewPosition() {
+    const positionNameInput = document.getElementById('newPositionName');
+    const positionName = positionNameInput.value.trim();
+    
+    if (!positionName) {
+        showAlert('Введите название должности', 'danger');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/positions/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: positionName })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Добавляем новую должность во все select'ы на странице
+            document.querySelectorAll('select[name="position_id"]').forEach(selectElement => {
+                // Проверяем, нет ли уже такой должности
+                const existingOption = Array.from(selectElement.options).find(option => 
+                    option.text === data.position_name
+                );
+                
+                if (!existingOption) {
+                    const newOption = new Option(data.position_name, data.position_id);
+                    selectElement.add(newOption);
+                }
+            });
+            
+            // Устанавливаем значение в целевом select'е
+            const targetSelect = document.getElementById(targetSelectElement);
+            if (targetSelect) {
+                targetSelect.value = data.position_id;
+            }
+            
+            // Закрываем модальное окно и очищаем поле
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addPositionModal'));
+            modal.hide();
+            positionNameInput.value = '';
+            
+            showAlert('Должность успешно добавлена', 'success');
+        } else {
+            showAlert('Ошибка при добавлении должности: ' + (data.error || 'Неизвестная ошибка'), 'danger');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Ошибка сети при добавлении должности', 'danger');
+    }
+}
 
 function confirmDeleteRoom(roomId, roomName) {
     roomToDelete = roomId;
@@ -552,7 +705,6 @@ function sortTable(tableId, columnIndex, sortKey) {
     rows.forEach(row => tbody.appendChild(row));
 }
 
-
 function resetRoomFilters() {
     document.getElementById('roomNameFilter').value = '';
     document.getElementById('roomTypeFilter').value = '';
@@ -573,10 +725,9 @@ function resetRoomFilters() {
     const filterModal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
     if (filterModal) filterModal.hide();
 }
-
 function applyEmployeeFilters() {
     const nameFilter = document.getElementById('employeeNameFilter')?.value.toLowerCase() || '';
-    const positionFilter = document.getElementById('employeePositionFilter')?.value.toLowerCase() || '';
+    const positionFilter = document.getElementById('employeePositionFilter')?.value || '';
     const typeFilter = document.getElementById('employeeTypeFilter')?.value || '';
     
     const rows = document.querySelectorAll('#employeesTable tbody tr');
@@ -586,12 +737,12 @@ function applyEmployeeFilters() {
         if (row.cells.length < 5) return;
         
         const name = row.cells[0].textContent.toLowerCase();
-        const position = row.cells[1].textContent.toLowerCase();
+        const position = row.cells[1].textContent;
         const isExternal = row.cells[2].querySelector('.badge').textContent.includes('Внешний');
         const externalValue = isExternal ? 'true' : 'false';
         
         const matchesName = !nameFilter || name.includes(nameFilter);
-        const matchesPosition = !positionFilter || position.includes(positionFilter);
+        const matchesPosition = !positionFilter || position === positionFilter;
         const matchesType = !typeFilter || externalValue === typeFilter;
         
         if (matchesName && matchesPosition && matchesType) {
@@ -666,304 +817,110 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    document.querySelectorAll('#roomsTable th[data-sort]').forEach((th, index) => {
-        th.style.cursor = 'pointer';
-        th.addEventListener('click', () => {
-            const sortKey = th.getAttribute('data-sort');
-            sortTable('roomsTable', index, sortKey);
-        });
-    });
     
-    document.querySelectorAll('#employeesTable th[data-sort]').forEach((th, index) => {
-        th.style.cursor = 'pointer';
-        th.addEventListener('click', () => {
-            const sortKey = th.getAttribute('data-sort');
-            sortTable('employeesTable', index, sortKey);
-        });
-    });
+    const isExternalRoomCheckbox = document.getElementById('isExternalRoom');
+    const externalRoomFields = document.getElementById('externalRoomFields');
     
-    const isExternalEmployee = document.getElementById('isExternalEmployee');
-    if (isExternalEmployee) {
-        isExternalEmployee.addEventListener('change', function() {
-            const externalFields = document.getElementById('externalEmployeeFields');
-            if (this.checked) {
-                externalFields.style.display = 'block';
-            } else {
-                externalFields.style.display = 'none';
-                document.getElementById('externalEmployeeUrl').value = '';
-            }
+    if (isExternalRoomCheckbox && externalRoomFields) {
+        isExternalRoomCheckbox.addEventListener('change', function() {
+            externalRoomFields.style.display = this.checked ? 'block' : 'none';
         });
     }
     
-    const isExternalRoom = document.getElementById('isExternalRoom');
-    if (isExternalRoom) {
-        isExternalRoom.addEventListener('change', function() {
-            const externalFields = document.getElementById('externalRoomFields');
-            if (this.checked) {
-                externalFields.style.display = 'block';
-            } else {
-                externalFields.style.display = 'none';
-                document.getElementById('externalRoomUrl').value = '';
-            }
-        });
-    }
+    const isExternalEmployeeCheckbox = document.getElementById('isExternalEmployee');
+    const externalEmployeeFields = document.getElementById('externalEmployeeFields');
     
-    const roomImageInput = document.getElementById('roomImage');
-    if (roomImageInput) {
-        roomImageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            const maxSize = 10 * 1024 * 1024; 
-            if (file.size > maxSize) {
-                alert('Размер файла не должен превышать 10MB');
-                e.target.value = '';
-                return;
-            }
-            
-            reader.onload = function(e) {
-                let previewContainer = document.getElementById('imagePreviewContainer');
-                if (!previewContainer) {
-                    previewContainer = document.createElement('div');
-                    previewContainer.id = 'imagePreviewContainer';
-                    previewContainer.className = 'mt-2';
-                    document.querySelector('#addRoomModal .modal-body').appendChild(previewContainer);
-                }
-                
-                previewContainer.innerHTML = '';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'img-thumbnail';
-                img.style.maxHeight = '200px';
-                previewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-    
-    const parseRoomBtn = document.getElementById('parseRoomBtn');
-    if (parseRoomBtn) {
-        parseRoomBtn.addEventListener('click', async function() {
-            const url = document.getElementById('externalRoomUrl').value.trim();
-            if (!url) {
-                alert('Пожалуйста, введите URL заведения на flamp.ru');
-                return;
-            }
-            
-            if (!url.includes('flamp.ru')) {
-                alert('Пожалуйста, введите корректную ссылку на flamp.ru');
-                return;
-            }
-            
-            const btn = this;
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
-            
-            try {
-                const response = await fetch('/api/parse/flamp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        url: url
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('roomName').value = data.data.name || '';
-                    document.getElementById('roomAddress').value = data.data.address || '';
-                    document.getElementById('roomCapacity').value = data.data.capacity || 50;
-                    document.getElementById('roomDescription').value = data.data.description || '';
-                    document.getElementById('roomType').value = data.data.room_type_id || 1;
-                    
-                    let parsedDataField = document.getElementById('parsedDataField');
-                    if (!parsedDataField) {
-                        parsedDataField = document.createElement('input');
-                        parsedDataField.type = 'hidden';
-                        parsedDataField.id = 'parsedDataField';
-                        parsedDataField.name = 'parsed_data';
-                        document.getElementById('addRoomForm').appendChild(parsedDataField);
-                    }
-                    parsedDataField.value = JSON.stringify(data.data);
-                    
-                    document.getElementById('isExternalRoom').checked = true;
-                    document.getElementById('externalRoomFields').style.display = 'block';
-                    
-                    showAlert('Данные успешно загружены из flamp.ru', 'success');
-                } else {
-                    showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка'), 'danger');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('Ошибка при отправке запроса', 'danger');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        });
-    }
-    
-    const parseEmployeeBtn = document.getElementById('parseEmployeeBtn');
-    if (parseEmployeeBtn) {
-        parseEmployeeBtn.addEventListener('click', async function() {
-            const url = document.getElementById('externalEmployeeUrl').value.trim();
-            if (!url) {
-                showAlert('Пожалуйста, введите URL резюме на hh.ru', 'danger');
-                return;
-            }
-
-            if (!url.includes('hh.ru/resume/')) {
-                showAlert('Некорректная ссылка на резюме. Пример: https://hh.ru/resume/123abc...', 'danger');
-                return;
-            }
-                        
-            const btn = this;
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Парсинг...';
-            
-            try {
-                const response = await fetch('/api/parse/hh', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        url: url
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('employeeFullName').value = data.data.full_name || '';
-                    document.getElementById('employeePosition').value = data.data.position || '';
-                    document.getElementById('employeeContactInfo').value = data.data.contact_info || '';
-                    
-                    let parsedDataField = document.getElementById('parsedEmployeeDataField');
-                    if (!parsedDataField) {
-                        parsedDataField = document.createElement('input');
-                        parsedDataField.type = 'hidden';
-                        parsedDataField.id = 'parsedEmployeeDataField';
-                        parsedDataField.name = 'parsed_data';
-                        document.getElementById('addEmployeeForm').appendChild(parsedDataField);
-                    }
-                    parsedDataField.value = JSON.stringify(data.data);
-                    
-                    document.getElementById('isExternalEmployee').checked = true;
-                    document.getElementById('externalEmployeeFields').style.display = 'block';
-                    
-                    showAlert('Данные успешно загружены из hh.ru', 'success');
-                } else {
-                    showAlert('Ошибка при парсинге: ' + (data.error || 'Неизвестная ошибка') + 
-                              '. Убедитесь, что ссылка ведет на конкретное резюме.', 'danger');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('Ошибка при отправке запроса', 'danger');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
+    if (isExternalEmployeeCheckbox && externalEmployeeFields) {
+        isExternalEmployeeCheckbox.addEventListener('change', function() {
+            externalEmployeeFields.style.display = this.checked ? 'block' : 'none';
         });
     }
     
     {% for employee in employees %}
     const editIsExternal{{ employee.id }} = document.getElementById('editIsExternal{{ employee.id }}');
-    if (editIsExternal{{ employee.id }}) {
-        editIsExternal{{ employee.id }}.addEventListener('change', function() {
-            const container = document.getElementById('editExternalUrlContainer{{ employee.id }}');
-            if (this.checked) {
-                container.style.display = 'block';
-            } else {
-                container.style.display = 'none';
-            }
-        });
-    }
+    const editExternalUrlContainer{{ employee.id }} = document.getElementById('editExternalUrlContainer{{ employee.id }}');
     
-    const editEmployeeForm{{ employee.id }} = document.getElementById('editEmployeeForm{{ employee.id }}');
-    if (editEmployeeForm{{ employee.id }}) {
-        editEmployeeForm{{ employee.id }}.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            try {
-                const formData = new FormData(this);
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    const error = await response.json();
-                    showAlert('Ошибка при обновлении: ' + (data.error || 'Неизвестная ошибка'), 'danger');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('Ошибка сети', 'danger');
-            }
+    if (editIsExternal{{ employee.id }} && editExternalUrlContainer{{ employee.id }}) {
+        editIsExternal{{ employee.id }}.addEventListener('change', function() {
+            editExternalUrlContainer{{ employee.id }}.style.display = this.checked ? 'block' : 'none';
         });
     }
     {% endfor %}
     
-    const addEmployeeForm = document.getElementById('addEmployeeForm');
-    if (addEmployeeForm) {
-        addEmployeeForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            try {
-                const response = await fetch('/employees/add', {
-                    method: 'POST',
-                    body: new FormData(this)
-                });
-                
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    const error = await response.json();
-                    alert('Ошибка: ' + (error.message || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Ошибка сети');
+    const roomImageInput = document.getElementById('roomImage');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    
+    if (roomImageInput && imagePreviewContainer) {
+        roomImageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreviewContainer.innerHTML = `
+                        <img src="${e.target.result}" class="img-thumbnail" style="max-height: 150px;" alt="Предпросмотр">
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreviewContainer.innerHTML = '';
             }
         });
     }
+    
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', function() {
+            const tableId = this.closest('table').id;
+            const columnIndex = Array.from(this.parentElement.children).indexOf(this);
+            const sortKey = this.getAttribute('data-sort');
+            sortTable(tableId, columnIndex, sortKey);
+        });
+    });
 });
-const style = document.createElement('style');
-style.textContent = `
-th[data-sort] {
-    cursor: pointer;
-    position: relative;
+</script>
+<style>
+/* Стили для правильного отображения вложенных модальных окон */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
 }
 
-th[data-sort]:hover {
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 1050;
+}
+
+/* Увеличиваем z-index для модального окна добавления должности */
+#addPositionModal {
+    z-index: 9999 !important;
+}
+
+/* Стили для таблиц */
+.table th[data-sort] {
+    cursor: pointer;
+    user-select: none;
+}
+
+.table th[data-sort]:hover {
     background-color: #f8f9fa;
 }
 
-th[data-order]::after {
+.table th[data-sort]::after {
     content: ' ↕';
-    font-size: 0.8em;
-    position: absolute;
-    right: 8px;
+    opacity: 0.5;
 }
 
-th[data-order="asc"]::after {
+.table th[data-sort][data-order="asc"]::after {
     content: ' ↑';
+    opacity: 1;
 }
 
-th[data-order="desc"]::after {
+.table th[data-sort][data-order="desc"]::after {
     content: ' ↓';
+    opacity: 1;
 }
-`;
-document.head.appendChild(style);
-</script>
+</style>
 {% endblock %}
 {% endblock %}

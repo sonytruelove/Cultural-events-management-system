@@ -796,86 +796,6 @@ async def change_password(
     finally:
         if 'conn' in locals():
             await conn.close()
-            
-@app.get("/events/{event_id}/edit")
-async def edit_event_form(
-    request: Request, 
-    event_id: int,
-    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
-):
-    try:
-        current_user = user_data["user"]
-        current_user['roles'] = user_data["roles"]
-        conn = await get_connection()
-        
-        
-        event = await conn.fetchrow(
-            """SELECT 
-                  e.id, e.name, e.description, e.start_time, e.end_time, 
-                  e.max_participants, e.event_type_id, e.status_id,
-                  e.min_age_category_id, e.organizer_id,
-                  et.name as event_type_name,
-                  es.name as status_name, 
-                  u.full_name as organizer_name,
-                  r.id as room_id, r.name as room_name,
-                  ac.name as age_category_name
-               FROM events e
-               LEFT JOIN event_types et ON et.id = e.event_type_id
-               LEFT JOIN event_statuses es ON es.id = e.status_id
-               LEFT JOIN users u ON u.id = e.organizer_id
-               LEFT JOIN resource_bookings rb ON rb.event_id = e.id AND rb.resource_type = 'room'
-               LEFT JOIN rooms r ON r.id = rb.resource_id
-               LEFT JOIN age_categories ac ON ac.id = e.min_age_category_id
-               WHERE e.id = $1""",
-            event_id
-        )
-        
-        if not event:
-            raise HTTPException(status_code=404, detail="Мероприятие не найдено")
-        
-        
-        employees = await conn.fetch(
-            """SELECT 
-                  e.id, e.full_name, e.position, e.is_external
-               FROM resource_bookings rb
-               JOIN employees e ON e.id = rb.resource_id
-               WHERE rb.event_id = $1 AND rb.resource_type = 'employee'""",
-            event_id
-        )
-        
-        
-        event_types = await conn.fetch("SELECT * FROM event_types ORDER BY name")
-        event_statuses = await conn.fetch("SELECT * FROM event_statuses ORDER BY name")
-        rooms = await conn.fetch("SELECT * FROM rooms ORDER BY name")
-        age_categories = await conn.fetch("SELECT * FROM age_categories ORDER BY name")
-        all_employees = await conn.fetch("SELECT * FROM employees ORDER BY full_name")
-        
-        
-        current_employee_ids = [e['id'] for e in employees]
-        
-        return templates.TemplateResponse(
-            "event_details.html",
-            {
-                "request": request,
-                "current_user": current_user,
-                "event": event,
-                "employees": employees,
-                "event_types": event_types,
-                "event_statuses": event_statuses,
-                "rooms": rooms,
-                "age_categories": age_categories,
-                "all_employees": all_employees,
-                "current_employee_ids": current_employee_ids
-            }
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error getting event details: {e}")
-        raise HTTPException(status_code=500, detail="Ошибка сервера")
-    finally:
-        if 'conn' in locals():
-            await conn.close()
 
 @app.post("/events/{event_id}/update")
 async def update_event(
@@ -1153,94 +1073,6 @@ async def events(
         )
     except HTTPException:
         return RedirectResponse(url="/unregistered")
-    finally:
-        if 'conn' in locals():
-            await conn.close()
-            
-@app.get("/rooms/{room_id}/edit")
-async def edit_room_form(
-    request: Request, 
-    room_id: int,
-    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
-):
-    try:
-        current_user = user_data["user"]
-        current_user['roles'] = user_data["roles"]
-        conn = await get_connection()
-        
-        room = await conn.fetchrow(
-            """SELECT r.*, rt.name as room_type_name 
-               FROM rooms r
-               LEFT JOIN room_types rt ON r.room_type_id = rt.id
-               WHERE r.id = $1""",
-            room_id
-        )
-        
-        if not room:
-            raise HTTPException(status_code=404, detail="Помещение не найдено")
-        
-        room_types = await conn.fetch("SELECT * FROM room_types ORDER BY name")
-        
-        return templates.TemplateResponse(
-            "edit_room.html",
-            {
-                "request": request,
-                "current_user": current_user,
-                "room": room,
-                "room_types": room_types
-            }
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error getting room edit form: {e}")
-        raise HTTPException(status_code=500, detail="Ошибка сервера")
-    finally:
-        if 'conn' in locals():
-            await conn.close()
-            
-@app.get("/rooms/{room_id}/edit")
-async def edit_room_form(
-    request: Request, 
-    room_id: int,
-    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
-):
-    try:
-        current_user = user_data["user"]
-        current_user['roles'] = user_data["roles"]
-        conn = await get_connection()
-        
-        # Получаем данные помещения
-        room = await conn.fetchrow(
-            """SELECT r.*, rt.name as room_type_name 
-               FROM rooms r
-               LEFT JOIN room_types rt ON r.room_type_id = rt.id
-               WHERE r.id = $1""",
-            room_id
-        )
-        
-        if not room:
-            raise HTTPException(status_code=404, detail="Помещение не найдено")
-        
-        # Получаем список типов помещений для выпадающего списка
-        room_types = await conn.fetch("SELECT * FROM room_types ORDER BY name")
-        
-        return templates.TemplateResponse(
-            "edit_room.html",
-            {
-                "request": request,
-                "current_user": current_user,
-                "room": room,
-                "room_types": room_types
-            }
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error getting room edit form: {e}")
-        raise HTTPException(status_code=500, detail="Ошибка сервера")
     finally:
         if 'conn' in locals():
             await conn.close()
@@ -1574,6 +1406,191 @@ async def external(request: Request,
     except HTTPException:
         return RedirectResponse(url="/unregistered")
 
+@app.get("/api/positions")
+async def get_positions():
+    """Получение списка всех должностей"""
+    try:
+        conn = await get_connection()
+        positions = await conn.fetch("SELECT id, name FROM positions ORDER BY name")
+        return {
+            "success": True,
+            "positions": [{"id": p["id"], "name": p["name"]} for p in positions]
+        }
+    except Exception as e:
+        print(f"Error getting positions: {e}")
+        return {"success": False, "error": str(e)}
+    finally:
+        if 'conn' in locals():
+            await conn.close()
+
+@app.post("/api/positions/add")
+async def add_position(request: Request):
+    """Добавление новой должности"""
+    try:
+        data = await request.json()
+        position_name = data.get('name', '').strip()
+        
+        if not position_name:
+            return {"success": False, "error": "Название должности не может быть пустым"}
+        
+        conn = await get_connection()
+        
+        # Проверяем, существует ли уже такая должность
+        existing_position = await conn.fetchrow(
+            "SELECT id, name FROM positions WHERE name = $1", 
+            position_name
+        )
+        
+        if existing_position:
+            return {
+                "success": True, 
+                "position_id": existing_position["id"],
+                "position_name": existing_position["name"],
+                "message": "Должность уже существует"
+            }
+        
+        # Создаем новую должность
+        position_id = await conn.fetchval(
+            "INSERT INTO positions (name) VALUES ($1) RETURNING id",
+            position_name
+        )
+        
+        return {
+            "success": True,
+            "position_id": position_id,
+            "position_name": position_name,
+            "message": "Должность успешно добавлена"
+        }
+        
+    except Exception as e:
+        print(f"Error adding position: {e}")
+        return {"success": False, "error": str(e)}
+    finally:
+        if 'conn' in locals():
+            await conn.close()
+            
+@app.post("/employees/add")
+async def add_employee(
+    request: Request,
+    full_name: str = Form(...),
+    position_id: Optional[int] = Form(None),
+    new_position: Optional[str] = Form(None),  # Новая должность, если пользователь хочет создать
+    contact_info: Optional[str] = Form(None),
+    is_external: bool = Form(False),
+    external_url: Optional[str] = Form(None),
+    parsed_data: Optional[str] = Form(None),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
+    """Добавление сотрудника (внутреннего или внешнего)"""
+    try:
+        conn = await get_connection()
+        current_user = user_data["user"]
+        
+        # Определяем ID должности
+        final_position_id = None
+        position_name = None
+        
+        if new_position and new_position.strip():
+            # Создаем новую должность
+            position_name = new_position.strip()
+            final_position_id = await conn.fetchval(
+                "INSERT INTO positions (name) VALUES ($1) RETURNING id",
+                position_name
+            )
+        elif position_id:
+            # Используем существующую должность
+            position_record = await conn.fetchrow(
+                "SELECT id, name FROM positions WHERE id = $1", 
+                position_id
+            )
+            if position_record:
+                final_position_id = position_record["id"]
+                position_name = position_record["name"]
+        
+        if not final_position_id:
+            raise HTTPException(
+                status_code=400, 
+                detail="Не указана должность"
+            )
+        
+        # Добавляем сотрудника
+        employee_id = await conn.fetchval("""
+            INSERT INTO employees (full_name, position, position_id, contact_info, is_external, external_url)
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
+        """, full_name, position_name, final_position_id, contact_info, is_external, external_url)
+        
+        return RedirectResponse(url="/rooms?tab=employees", status_code=303)
+        
+    except Exception as e:
+        print(f"Error adding employee: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Ошибка при добавлении сотрудника: {str(e)}"
+        )
+    finally:
+        if 'conn' in locals():
+            await conn.close()
+            
+@app.post("/employees/{employee_id}/update")
+async def update_employee(
+    request: Request,
+    employee_id: int,
+    full_name: str = Form(...),
+    position_id: Optional[int] = Form(None),
+    new_position: Optional[str] = Form(None),
+    contact_info: Optional[str] = Form(None),
+    is_external: bool = Form(False),
+    external_url: Optional[str] = Form(None),
+    user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
+):
+    """Обновление данных сотрудника"""
+    try:
+        conn = await get_connection()
+        
+        # Определяем ID должности (аналогично добавлению)
+        final_position_id = None
+        position_name = None
+        
+        if new_position and new_position.strip():
+            position_name = new_position.strip()
+            final_position_id = await conn.fetchval(
+                "INSERT INTO positions (name) VALUES ($1) RETURNING id",
+                position_name
+            )
+        elif position_id:
+            position_record = await conn.fetchrow(
+                "SELECT id, name FROM positions WHERE id = $1", 
+                position_id
+            )
+            if position_record:
+                final_position_id = position_record["id"]
+                position_name = position_record["name"]
+        
+        if not final_position_id:
+            raise HTTPException(status_code=400, detail="Не указана должность")
+        
+        await conn.execute("""
+            UPDATE employees SET 
+                full_name = $1, 
+                position = $2, 
+                position_id = $3, 
+                contact_info = $4, 
+                is_external = $5, 
+                external_url = $6 
+            WHERE id = $7
+        """, full_name, position_name, final_position_id, contact_info, is_external, external_url, employee_id)
+        
+        return RedirectResponse(url="/rooms?tab=employees", status_code=303)
+        
+    except Exception as e:
+        print(f"Error updating employee: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Ошибка при обновлении сотрудника: {str(e)}"
+        )
+    finally:
+        if 'conn' in locals():
+            await conn.close()
 @app.get("/rooms")
 async def rooms(request: Request,
                 user_data: dict = Depends(role_required(['Организатор', 'Администратор']))
@@ -1592,10 +1609,19 @@ async def rooms(request: Request,
         """)
         
         employees = await conn.fetch("""
-            SELECT * FROM employees ORDER BY full_name
+            SELECT e.*, p.name as position_name 
+            FROM employees e
+            LEFT JOIN positions p ON e.position_id = p.id
+            ORDER BY e.full_name
         """)
         
         room_types = await conn.fetch("SELECT * FROM room_types ORDER BY name")
+        positions = await conn.fetch("SELECT * FROM positions ORDER BY name")
+        
+        # Добавьте эту проверку для отладки
+        print(f"Количество должностей: {len(positions)}")
+        for position in positions:
+            print(f"Должность: {position['name']} (ID: {position['id']})")
         
         return templates.TemplateResponse(
             "rooms.html",
@@ -1604,7 +1630,8 @@ async def rooms(request: Request,
                 "current_user": current_user,
                 "rooms": rooms,
                 "employees": employees,  
-                "room_types": room_types
+                "room_types": room_types,
+                "positions": positions  # Убедитесь, что это передается
             }
         )
     except HTTPException as e:
@@ -1621,7 +1648,6 @@ async def rooms(request: Request,
     finally:
         await conn.close()
         
-
 @app.get("/rooms/{room_id}")
 async def room_details(request: Request, room_id: int,
                        user_data: dict = Depends(role_required(['Организатор', 'Администратор']))):
@@ -1629,6 +1655,8 @@ async def room_details(request: Request, room_id: int,
         conn = await get_connection()
         current_user = user_data["user"]
         current_user['roles'] = user_data["roles"]
+        
+        # Получаем данные помещения
         room = await conn.fetchrow(
             """SELECT r.*, rt.name as room_type_name 
                FROM rooms r
@@ -1640,7 +1668,10 @@ async def room_details(request: Request, room_id: int,
         if not room:
             raise HTTPException(status_code=404, detail="Помещение не найдено")
             
+        # Получаем список типов помещений для формы редактирования
+        room_types = await conn.fetch("SELECT * FROM room_types ORDER BY name")
         
+        # Получаем мероприятия в этом помещении
         events = await conn.fetch(
             """SELECT e.id, e.name, e.start_time, e.end_time 
                FROM events e
@@ -1656,6 +1687,7 @@ async def room_details(request: Request, room_id: int,
                 "request": request,
                 "current_user": current_user,
                 "room": room,
+                "room_types": room_types,  # Добавляем типы помещений
                 "events": events
             }
         )
@@ -1913,81 +1945,6 @@ async def add_room(
         return templates.TemplateResponse(
             "error.html",
             {"request": request, "error": "Ошибка при добавлении помещения"},
-            status_code=500
-        )
-    finally:
-        if 'conn' in locals():
-            await conn.close()
-
-@app.post("/employees/add")
-async def add_employee(
-    request: Request,
-    full_name: str = Form(...),
-    position: str = Form(...),
-    contact_info: Optional[str] = Form(None),
-    is_external: bool = Form(False),
-    external_url: Optional[str] = Form(None),
-    parsed_data: Optional[str] = Form(None)  
-):
-    """Добавление сотрудника (внутреннего или внешнего)"""
-    try:
-        conn = await get_connection()
-        
-        
-        if parsed_data:
-            try:
-                parsed_data = json.loads(parsed_data)
-                full_name = parsed_data.get('full_name', full_name)
-                position = parsed_data.get('position', position)
-                contact_info = parsed_data.get('contact_info', contact_info)
-                is_external = True  
-                external_url = parsed_data.get('external_url', external_url)
-            except json.JSONDecodeError as e:
-                print(f"Ошибка декодирования JSON: {e}")
-                
-        
-        await conn.execute(
-            "INSERT INTO employees (full_name, position, contact_info, is_external, external_url) "
-            "VALUES ($1, $2, $3, $4, $5)",
-            full_name, position, contact_info, is_external, external_url
-        )
-        
-        return RedirectResponse(url="/rooms", status_code=303)
-    except Exception as e:
-        print(f"Error adding employee: {e}")
-        return templates.TemplateResponse(
-            "error.html", 
-            {"request": request, "error": str(e)}, 
-            status_code=500
-        )
-    finally:
-        await conn.close()
-        
-@app.post("/employees/{employee_id}/update")
-async def update_employee(
-    request: Request,
-    employee_id: int,
-    full_name: str = Form(...),
-    position: str = Form(...),
-    contact_info: Optional[str] = Form(None),
-    is_external: bool = Form(False),
-    external_url: Optional[str] = Form(None)
-):
-    """Обновление данных сотрудника"""
-    try:
-        conn = await get_connection()
-        
-        await conn.execute(
-            "UPDATE employees SET full_name = $1, position = $2, contact_info = $3, is_external = $4, external_url = $5 WHERE id = $6",
-            full_name, position, contact_info, is_external, external_url, employee_id
-        )
-        
-        return RedirectResponse(url="/employees", status_code=303)
-    except Exception as e:
-        print(f"Error updating employee: {e}")
-        return templates.TemplateResponse(
-            "error.html",
-            {"request": request, "error": "Ошибка при обновлении сотрудника"},
             status_code=500
         )
     finally:

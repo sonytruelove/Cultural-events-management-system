@@ -26,6 +26,7 @@ async def drop_tables(conn):
             DROP TABLE IF EXISTS event_statuses CASCADE;
             DROP TABLE IF EXISTS room_types CASCADE;
             DROP TABLE IF EXISTS event_types CASCADE;
+            DROP TABLE IF EXISTS positions CASCADE;
         """)
         print("All tables dropped successfully")
     except Exception as e:
@@ -65,6 +66,36 @@ async def add_test_data(conn):
     print("Adding test data...")
     
     try:
+        # Добавляем должности
+        positions_data = [
+            'Менеджер проектов',
+            'Дизайнер мероприятий',
+            'IT-специалист',
+            'Координатор мероприятий',
+            'Консультант по UX',
+            'Тренер по agile',
+            'Архитектор решений',
+            'Фотограф',
+            'Видеооператор',
+            'Ведущий мероприятий',
+            'Звукорежиссер',
+            'Декоратор',
+            'Администратор',
+            'Охранник',
+            'Уборщик',
+            'Технический специалист',
+            'Маркетолог',
+            'Бухгалтер',
+            'Юрист',
+            'HR-менеджер'
+        ]
+        
+        for position_name in positions_data:
+            await conn.execute("""
+                INSERT INTO positions (name) VALUES ($1::VARCHAR(100))
+                ON CONFLICT DO NOTHING;
+            """, position_name)
+        
         await conn.execute("""
             INSERT INTO roles (name) VALUES 
             ('Администратор'), ('Организатор'), ('Сотрудник'), ('Пользователь')
@@ -72,7 +103,7 @@ async def add_test_data(conn):
         """)
         
         users_data = [
-            ('admin@example.com', 'admin123', 'Администратор Системы', 'admin@example.com'),
+            ('admin@example.com', 'admin123', 'Правящий Александр Владимирович', 'admin@example.com'),
             ('org1@example.com', 'org123', 'Иванова Мария Петровна', 'org1@example.com'),
             ('org2@example.com', 'org123', 'Смирнов Алексей Владимирович', 'org2@example.com'),
             ('coord1@example.com', 'coord123', 'Петров Дмитрий Иванович', 'coord1@example.com')
@@ -81,7 +112,7 @@ async def add_test_data(conn):
         for username, password, full_name, email in users_data:
             await conn.execute("""
                 INSERT INTO users (username, password_hash, full_name, email) VALUES
-                ($1, $2, $3, $4)
+                ($1::VARCHAR(50), $2::VARCHAR(255), $3::VARCHAR(255), $4::VARCHAR(255))
                 ON CONFLICT DO NOTHING;
             """, username, pwd_context.hash(password), full_name, email)
         
@@ -147,10 +178,11 @@ async def add_test_data(conn):
         for name, room_type, capacity, address, description, image_filename in rooms_data:
             await conn.execute("""
             INSERT INTO rooms (name, room_type_id, capacity, address, description, image_filename)
-            VALUES ($1, (SELECT id FROM room_types WHERE name = $2), $3, $4, $5, $6)
+            VALUES ($1::VARCHAR(255), (SELECT id FROM room_types WHERE name = $2::VARCHAR(100)), $3::INTEGER, $4::VARCHAR(255), $5::TEXT, $6::VARCHAR(255))
             ON CONFLICT DO NOTHING;
         """, name, room_type, capacity, address, description, image_filename)
         
+        # Обновляем данные сотрудников с использованием position_id
         employees_data = [
             ('Иванов Алексей Петрович', 'Менеджер проектов', 'ivanov@example.com', False),
             ('Петрова Светлана Михайловна', 'Дизайнер мероприятий', 'petrova@example.com', False),
@@ -164,17 +196,26 @@ async def add_test_data(conn):
             ('Соколова Ольга Игоревна', 'Ведущий мероприятий', 'sokolova@example.com', True),
             ('Козлов Михаил Андреевич', 'Звукорежиссер', 'kozlov@example.com', True),
             ('Новикова Татьяна Викторовна', 'Декоратор', 'novikova@example.com', True),
-            ('Петров Дмитрий Иванович', 'Координатор мероприятий', 'coord1@example.com', False)  # Добавлен как сотрудник
+            ('Петров Дмитрий Иванович', 'Координатор мероприятий', 'coord1@example.com', False)
         ]
         
-        for full_name, position, contact_info, is_external in employees_data:
-            await conn.execute("""
-                INSERT INTO employees (full_name, position, contact_info, is_external)
-                VALUES ($1, $2, $3, $4)
-                ON CONFLICT DO NOTHING;
-            """, full_name, position, contact_info, is_external)
+        for full_name, position_name, contact_info, is_external in employees_data:
+            # Сначала получаем ID должности
+            position_id = await conn.fetchval(
+                "SELECT id FROM positions WHERE name = $1::VARCHAR(100)", 
+                position_name
+            )
+            
+            if position_id:
+                await conn.execute("""
+                    INSERT INTO employees (full_name, position, position_id, contact_info, is_external)
+                    VALUES ($1::VARCHAR(200), $2::VARCHAR(200), $3::INTEGER, $4::TEXT, $5::BOOLEAN)
+                    ON CONFLICT DO NOTHING;
+                """, full_name, position_name, position_id, contact_info, is_external)
+            else:
+                print(f"Должность '{position_name}' не найдена, пропускаем сотрудника '{full_name}'")
         
-    
+        # Остальной код остается без изменений...
         events_data = [
             # Существующие мероприятия
             ('Технологическая конференция "Цифровой Байкал"', 
@@ -249,11 +290,11 @@ async def add_test_data(conn):
             await conn.execute("""
                 INSERT INTO events (name, description, start_time, end_time, max_participants, 
                                   min_age_category_id, status_id, event_type_id, organizer_id)
-                VALUES ($1, $2, $3, $4, $5, 
-                       (SELECT id FROM age_categories WHERE name = $6),
-                       (SELECT id FROM event_statuses WHERE name = $7),
-                       (SELECT id FROM event_types WHERE name = $8),
-                       (SELECT id FROM users WHERE username = $9))
+                VALUES ($1::VARCHAR(255), $2::TEXT, $3::TIMESTAMP, $4::TIMESTAMP, $5::INTEGER, 
+                       (SELECT id FROM age_categories WHERE name = $6::VARCHAR(20)),
+                       (SELECT id FROM event_statuses WHERE name = $7::VARCHAR(50)),
+                       (SELECT id FROM event_types WHERE name = $8::VARCHAR(100)),
+                       (SELECT id FROM users WHERE username = $9::VARCHAR(50)))
                 ON CONFLICT DO NOTHING;
             """, name, description, start_time, end_time, max_participants, 
                age_category, status, event_type, organizer)
@@ -288,16 +329,16 @@ async def add_test_data(conn):
             await conn.execute("""
                 INSERT INTO resource_bookings (event_id, resource_type, resource_id, start_time, end_time)
                 SELECT 
-                    (SELECT id FROM events WHERE name = $1),
+                    (SELECT id FROM events WHERE name = $1::VARCHAR(255)),
                     'room',
-                    (SELECT id FROM rooms WHERE name = $2),
-                    (SELECT start_time FROM events WHERE name = $1),
-                    (SELECT end_time FROM events WHERE name = $1)
+                    (SELECT id FROM rooms WHERE name = $2::VARCHAR(255)),
+                    (SELECT start_time FROM events WHERE name = $1::VARCHAR(255)),
+                    (SELECT end_time FROM events WHERE name = $1::VARCHAR(255))
                 WHERE NOT EXISTS (
                     SELECT 1 FROM resource_bookings 
-                    WHERE event_id = (SELECT id FROM events WHERE name = $1)
+                    WHERE event_id = (SELECT id FROM events WHERE name = $1::VARCHAR(255))
                     AND resource_type = 'room'
-                    AND resource_id = (SELECT id FROM rooms WHERE name = $2)
+                    AND resource_id = (SELECT id FROM rooms WHERE name = $2::VARCHAR(255))
                 )
             """, event_name, room_name)
         
@@ -328,16 +369,16 @@ async def add_test_data(conn):
                 await conn.execute("""
                     INSERT INTO resource_bookings (event_id, resource_type, resource_id, start_time, end_time)
                     SELECT 
-                        (SELECT id FROM events WHERE name = $1),
+                        (SELECT id FROM events WHERE name = $1::VARCHAR(255)),
                         'employee',
-                        (SELECT id FROM employees WHERE full_name = $2),
-                        (SELECT start_time FROM events WHERE name = $1),
-                        (SELECT end_time FROM events WHERE name = $1)
+                        (SELECT id FROM employees WHERE full_name = $2::VARCHAR(200)),
+                        (SELECT start_time FROM events WHERE name = $1::VARCHAR(255)),
+                        (SELECT end_time FROM events WHERE name = $1::VARCHAR(255))
                     WHERE NOT EXISTS (
                         SELECT 1 FROM resource_bookings 
-                        WHERE event_id = (SELECT id FROM events WHERE name = $1)
+                        WHERE event_id = (SELECT id FROM events WHERE name = $1::VARCHAR(255))
                         AND resource_type = 'employee'
-                        AND resource_id = (SELECT id FROM employees WHERE full_name = $2)
+                        AND resource_id = (SELECT id FROM employees WHERE full_name = $2::VARCHAR(200))
                     )
                 """, event_name, employee_name)
         

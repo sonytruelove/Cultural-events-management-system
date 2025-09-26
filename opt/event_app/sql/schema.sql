@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS room_types CASCADE;
 DROP TABLE IF EXISTS event_types CASCADE;
 DROP TABLE IF EXISTS event_statuses CASCADE;
 DROP TABLE IF EXISTS age_categories CASCADE;
+DROP TABLE IF EXISTS positions CASCADE;
 
 -- Расширение для временных интервалов
 CREATE EXTENSION IF NOT EXISTS btree_gist;
@@ -38,6 +39,13 @@ CREATE TABLE event_types (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     category VARCHAR(50) NOT NULL
+);
+
+-- Должности сотрудников
+CREATE TABLE positions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Пользователи и роли
@@ -74,13 +82,17 @@ CREATE TABLE rooms (
     external_url TEXT
 );
 
+-- Сотрудники
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
-    position VARCHAR(100) NOT NULL,
+    full_name VARCHAR(200) NOT NULL,
+    position VARCHAR(200), -- Оставляем для обратной совместимости
+    position_id INTEGER REFERENCES positions(id), -- Ссылка на таблицу positions
     contact_info TEXT,
     is_external BOOLEAN DEFAULT FALSE,
-    external_url TEXT
+    external_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Мероприятия
@@ -93,7 +105,7 @@ CREATE TABLE events (
     max_participants INT,
     min_age_category_id INT REFERENCES age_categories(id),
     status_id INT REFERENCES event_statuses(id),
-    event_type_id INT REFERENCES event_types(id),  -- Added this line
+    event_type_id INT REFERENCES event_types(id),
     organizer_id INT REFERENCES users(id)
 );
 
@@ -149,8 +161,11 @@ CREATE TABLE event_participants (
     PRIMARY KEY (event_id, user_id)
 );
 
--- Назначим администратору роль admin
-INSERT INTO user_roles (user_id, role_id) 
-SELECT u.id, r.id FROM users u, roles r 
-WHERE u.username = 'admin@eventsystem.com' AND r.name = 'Администратор'
-ON CONFLICT DO NOTHING;
+-- Таблица сессий пользователей
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    session_token TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL
+);

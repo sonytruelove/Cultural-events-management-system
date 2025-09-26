@@ -378,6 +378,11 @@
     border: 1px solid transparent;
 }
 
+.modal-header {
+    border-bottom: 2px solid #0d6efd;
+}
+
+
 #addParticipantsModal .nav-tabs .nav-link.active {
     color: white;
     background-color: #0d6efd;
